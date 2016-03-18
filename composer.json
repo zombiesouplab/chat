@@ -1,0 +1,13 @@
+{
+    "name": "musonza/chat",
+    "description": "Laravel chat package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tinashe Musonza",
+            "email": "tinashemusonza@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
