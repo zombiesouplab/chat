@@ -4,9 +4,9 @@ This package allows you to add a chat system to your Laravel 5 application
 
 ## Installation
 
-Require the package via composer:
+Add to composer.json and run composer update:
 
-`composer require musonza/chat`
+`"musonza/chat": "@dev"`
 
 Publish the assets:
 
