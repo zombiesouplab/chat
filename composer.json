@@ -14,8 +14,9 @@
             "email": "tinashemusonza@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "require": {
+        "musonza/chat": "dev-master",
         "illuminate/support": "^5.2"
     },
     "autoload": {
