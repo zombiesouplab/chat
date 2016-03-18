@@ -33,6 +33,9 @@ The package assumes you have a User model in the App namespace
 #### Creating a conversation
 `$conversation = Chat::createConversation([$userId, $userId2,...]); //takes an array of user ids`
 
+#### Get a conversation given a conversation_id
+`$conversation = Chat::conversation($conversation_id);`
+
 #### Send a message
 
 `Chat::send($conversation->id, 'Hello', $userId); //$userId sending a message to created conversation`
