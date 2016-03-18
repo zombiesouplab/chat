@@ -2,6 +2,12 @@
     "name": "musonza/chat",
     "description": "Laravel chat package",
     "license": "MIT",
+    "keywords": [
+        "laravel",
+        "chat",
+        "messaging",
+        "conversation"
+    ],
     "authors": [
         {
             "name": "Tinashe Musonza",
@@ -9,5 +15,12 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "illuminate/support": "^5.2"
+    },
+    "autoload": {
+        "psr-4": {
+          "Tinashe\\Chat\\": "src/"
+        }
+    }
 }
