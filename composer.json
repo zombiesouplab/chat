@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-          "Tinashe\\Chat\\": "src/"
+          "Musonza\\Chat\\": "src/"
         }
     }
 }
