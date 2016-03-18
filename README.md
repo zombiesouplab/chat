@@ -8,12 +8,6 @@ Add to composer.json and run composer update:
 
 `"musonza/chat": "@dev"`
 
-Publish the assets:
-
-`php artisan vendor:publish`
-
-This will publish database migrations.
-
 Add the service provider to your `config\app.php` the providers array
 
 `Musonza\Chat\ChatServiceProvider`
@@ -25,6 +19,12 @@ You can use the facade for shorter code. Add this to your aliases:
 The class is bound to the ioC as chat
 
 `$chat = App::make('chat');`
+
+Publish the assets:
+
+`php artisan vendor:publish`
+
+This will publish database migrations.
 
 ## Usage
 
