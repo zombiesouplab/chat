@@ -19,7 +19,7 @@ Musonza\Chat\ChatServiceProvider
 You can use the facade for shorter code. Add this to your aliases:
 
 ```
-'Chat' => Musonza\Chat\Facades\ChatFacade::class` to your `config\app.php
+'Chat' => Musonza\Chat\Facades\ChatFacade::class to your `config\app.php`
 ```
 
 The class is bound to the ioC as chat
