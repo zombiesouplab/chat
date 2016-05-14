@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/musonza/chat.svg?branch=master)](https://travis-ci.org/musonza/chat)
 ## Chat 
 
 This package allows you to add a chat system to your Laravel 5 application
