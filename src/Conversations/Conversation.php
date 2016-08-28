@@ -59,12 +59,8 @@ class Conversation extends Eloquent
      */
     public function addParticipants($userIds)
     {
-        if (is_array($userIds)) {
-            $this->users()->sync($userIds);
-        } else {
-            $this->users()->attach($userIds);
-        }
-
+        $this->users()->attach($userIds);
+        
         if ($this->users->count() > 2) {
             $this->private = false;
             $this->save();
