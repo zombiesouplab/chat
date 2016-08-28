@@ -128,22 +128,15 @@ class ChatTest extends TestCase
 
         $conversation = Chat::createConversation([$users[0]->id, $users[1]->id]);
 
-        Chat::send($conversation->id, 'Hello there 0', $users[0]->id);
+        Chat::send($conversation->id, 'Hello there 0', $users[1]->id);
         Chat::send($conversation->id, 'Hello there 1', $users[0]->id);
         Chat::send($conversation->id, 'Hello there 2', $users[0]->id);
 
-        $conversation = Chat::createConversation([$users[0]->id, $users[2]->id]);
+        Chat::send($conversation->id, 'Hello there 3', $users[1]->id);
+        Chat::send($conversation->id, 'Hello there 4', $users[1]->id);
+        Chat::send($conversation->id, 'Hello there 5', $users[1]->id);
 
-        Chat::send($conversation->id, 'Hello there 3', $users[0]->id);
-        Chat::send($conversation->id, 'Hello there 4', $users[0]->id);
-        Chat::send($conversation->id, 'Hello there 5', $users[0]->id);
-
-        $this->seeInDatabase('message_notification',
-            array(
-                ['id' => 1, 'user_id' => 1],
-                ['id' => 2, 'user_id' => 2],
-            )
-        );
+        $this->seeInDatabase('message_notification', ['id' => 1]);
     }
 
     /** @test */
