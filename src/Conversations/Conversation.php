@@ -3,6 +3,7 @@
 namespace Musonza\Chat\Conversations;
 
 use Eloquent;
+use Musonza\Chat\Chat;
 use Musonza\Chat\Notifications\MessageNotification;
 
 class Conversation extends Eloquent
@@ -16,7 +17,7 @@ class Conversation extends Eloquent
      */
     public function users()
     {
-        return $this->belongsToMany('App\User', 'conversation_user')->withTimestamps();
+        return $this->belongsToMany(Chat::userModel(), 'conversation_user')->withTimestamps();
     }
 
     /**

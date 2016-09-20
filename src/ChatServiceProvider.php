@@ -35,6 +35,7 @@ class ChatServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/migrations' => database_path('/migrations'),
+            __DIR__ . '/config' => config_path(),
         ]);
 
     }

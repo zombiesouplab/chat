@@ -4,6 +4,7 @@ namespace Musonza\Chat\Notifications;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Musonza\Chat\Chat;
 use Musonza\Chat\Conversations\Conversation;
 use Musonza\Chat\Messages\Message;
 
@@ -19,7 +20,7 @@ class MessageNotification extends Eloquent
 
     public function sender()
     {
-        return $this->belongsTo('App\User', 'user_id');
+        return $this->belongsTo(Chat::userModel(), 'user_id');
     }
 
     public function message()

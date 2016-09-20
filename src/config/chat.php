@@ -1,2 +1,4 @@
 <?php
-return ["message" => "Welcome to your new package"];
+return [
+    'user_model' => "App\User",
+];

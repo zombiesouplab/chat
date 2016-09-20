@@ -36,11 +36,12 @@ Publish the assets:
 php artisan vendor:publish
 ```
 
-This will publish database migrations.
+This will publish database migrations and a configuration file `chat.php` in the Laravel config folder.
 
 ## Usage
 
-The package assumes you have a User model in the App namespace
+By default the package assumes you have a User model in the App namespace. However, you can update the
+user model in 'chat.php' published in the `config` folder.
 
 #### Creating a conversation
 ```
