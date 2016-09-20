@@ -5,6 +5,7 @@ namespace Musonza\Chat\Messages;
 use Eloquent;
 use Musonza\Chat\Conversations\Conversation;
 use Musonza\Chat\Eventing\EventGenerator;
+use Musonza\Chat\Chat;
 use Musonza\Chat\Notifications\MessageNotification;
 
 class Message extends Eloquent
@@ -17,7 +18,7 @@ class Message extends Eloquent
 
     public function sender()
     {
-        return $this->belongsTo('App\User', 'user_id');
+        return $this->belongsTo(Chat::userModel(), 'user_id');
     }
 
     public function conversation()

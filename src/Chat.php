@@ -183,12 +183,21 @@ class Chat
 
         $common_conversations = $this->getConversationsInCommon($conversation1, $conversation2);
 
+        if(!$common_conversations){
+            return null;
+        }
+
         return $this->conversation->findOrFail($common_conversations[0]);
     }
 
     private function getConversationsInCommon($conversation1, $conversation2)
     {
         return array_values(array_intersect($conversation1, $conversation2));
+    }
+
+    public static function userModel()
+    {
+        return config('chat.user_model');
     }
 
 }
