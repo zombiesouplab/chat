@@ -13,6 +13,8 @@ class Message extends Eloquent
     protected $fillable = ['body', 'user_id', 'type'];
 
     protected $table = 'messages';
+    
+    protected $touches = ['conversation'];
 
     use EventGenerator;
 
