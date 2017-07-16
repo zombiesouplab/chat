@@ -6,7 +6,7 @@ php:
 
 before_install:
   - composer self-update
-  - composer create-project laravel/laravel
+  - composer create-project laravel/laravel "5.1.*"
   - cd ./laravel
   - composer config repositories.musonza vcs https://github.com/musonza/chat.git
   - composer require musonza/chat dev-master
