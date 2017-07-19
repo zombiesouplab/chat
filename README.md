@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/musonza/chat.svg?branch=master)](https://travis-ci.org/musonza/chat)
 [![Downloads](https://img.shields.io/packagist/dt/musonza/chat.svg?style=flat-square)](https://packagist.org/packages/musonza/chat)
+[![Code Climate](https://codeclimate.com/github/musonza/chat/badges/gpa.svg)](https://codeclimate.com/github/musonza/chat)
 ## Chat 
 
 This package allows you to add a chat system to your Laravel 5 application
