@@ -4,18 +4,50 @@ namespace Musonza\Chat;
 
 use Musonza\Chat\Commanding\CommandBus;
 use Musonza\Chat\Conversations\Conversation;
-use Musonza\Chat\Conversations\ConversationUser;
 use Musonza\Chat\Messages\Message;
 use Musonza\Chat\Messages\SendMessageCommand;
-use Musonza\Chat\Notifications\MessageNotification;
 
 class Chat
 {
-    public function __construct(
-        Conversation $conversation,
-        Message $message,
-        CommandBus $commandBus
-    ) {
+    /**
+     * Type of message being sent
+     *
+     * @var        string
+     */
+    protected $type = 'text';
+
+    /**
+     * Message sender
+     *
+     * @var int | User
+     */
+    protected $from;
+
+    /**
+     * Message recipient
+     *
+     * @var Conversation id
+     */
+    protected $to;
+
+    /**
+     * Message content
+     *
+     * @var        string
+     */
+    protected $body;
+
+    protected $perPage = 25;
+
+    protected $page = 1;
+
+    /**
+     * @param      \Musonza\Chat\Conversations\Conversation  $conversation  The conversation
+     * @param      \Musonza\Chat\Messages\Message            $message       The message
+     * @param      \Musonza\Chat\Commanding\CommandBus       $commandBus    The command bus
+     */
+    public function __construct(Conversation $conversation, Message $message, CommandBus $commandBus)
+    {
         $this->conversation = $conversation;
         $this->message = $message;
         $this->commandBus = $commandBus;
@@ -25,16 +57,17 @@ class Chat
      * Creates a new conversation
      *
      * @param array $participants
+     * @param array $data
      *
      * @return Conversation
      */
-    public function createConversation(array $participants = null)
+    public function createConversation(array $participants, array $data = null)
     {
         return $this->conversation->start($participants);
     }
 
     /**
-     * Returns a new conversation
+     * Returns a conversation
      *
      * @param int $conversationId
      *
@@ -48,156 +81,271 @@ class Chat
     /**
      * Add user(s) to a conversation
      *
-     * @param int $conversationId
-     * @param mixed $userId / array of user ids or an integer
+     * @param Conversation $conversation
+     * @param int | array $userId / array of user ids or an integer
      *
      * @return Conversation
      */
-    public function addParticipants($conversationId, $userId)
+    public function addParticipants(Conversation $conversation, $userId)
     {
-        return $this->conversation($conversationId)->addParticipants($userId);
+        $conversation->addParticipants($userId);
     }
 
     /**
-     * Sends a message
+     * Set the message
      *
-     * @param int $conversationId
-     * @param string $body
-     * @param int $senderId
-     *
-     * @return
+     * @param Message $message
+     * @return $this
      */
-    public function send($conversationId, $body, $senderId)
+    public function messages(Message $message)
     {
-        $conversation = $this->conversation->findOrFail($conversationId);
+        $this->message = $message;
 
-        $command = new SendMessageCommand($conversation, $body, $senderId);
+        return $this;
+    }
 
-        $this->commandBus->execute($command);
+    /**
+     * Set the limit
+     *
+     * @param int $limit
+     * @return $this
+     */
+    public function limit($limit)
+    {
+        $this->perPage = $limit ? $limit : $this->perPage;
+
+        return $this;
+    }
+
+    /**
+     * Set current page for pagination
+     *
+     * @param int $page
+     * @return $this
+     */
+    public function page($page)
+    {
+        $this->page = $page ? $page : $this->page;
+        return $this;
+    }
+
+    /**
+     * Sets user
+     *
+     * @param object $user
+     * @return $this
+     */
+    function for ($user) {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * Mark a message as read
+     *
+     * @return void
+     */
+    public function markRead()
+    {
+        $this->message->markRead($this->user);
+    }
+
+    /**
+     * Set Sender
+     *
+     * @param int $from
+     *
+     * @return $this
+     */
+    public function from($from)
+    {
+        $this->from = is_object($from) ? $from->id : $from;
+        return $this;
+    }
+
+    /**
+     * Set Message type
+     *
+     * @param string type
+     *
+     * @return $this
+     */
+    public function type(String $type)
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * Sets Receiver
+     *
+     * @param Conversation $to
+     *
+     * @return $this
+     */
+    public function to(Conversation $to)
+    {
+        $this->to = $to;
+
+        return $this;
+    }
+
+    /**
+     * Sets message body
+     *
+     * @param string $body
+     * @return $this
+     */
+    public function message(String $body)
+    {
+        $this->body = $body;
+
+        return $this;
+    }
+
+    /**
+     * Sends the message
+     *
+     * @return void
+     */
+    public function send()
+    {
+        if (!$this->from) {
+            throw new \Exception('Message sender has not been set');
+        }
+
+        if (!$this->body) {
+            throw new \Exception('Message body has not been set');
+        }
+
+        if (!$this->to) {
+            throw new \Exception('Message receiver has not been set');
+        }
+
+        $command = new SendMessageCommand($this->to, $this->body, $this->from, $this->type);
+
+        return $this->commandBus->execute($command);
     }
 
     /**
      * Remove user(s) from a conversation
      *
-     * @param int $conversationId
-     * @param mixed $userId / array of user ids or an integer
+     * @param Conversation $conversation
+     * @param $users / array of user ids or an integer
      *
-     * @return Coonversation
+     * @return Conversation
      */
-    public function removeParticipants($conversationId, $userId)
+    public function removeParticipants($conversation, $users)
     {
-        return $this->conversation($conversationId)->removeUsers($userId);
+        return $conversation->removeUsers($users);
     }
 
     /**
-     * Get recent user messages for each conversation
+     * Get Conversations with lastest message
      *
-     * @param int $userId
+     * @param Object $user
      *
-     * @return Message
+     * @return Illuminate\Pagination\LengthAwarePaginator
      */
-    public function conversations($userId)
+    public function get()
     {
-        $c = ConversationUser::join('messages', 'messages.conversation_id', '=', 'conversation_user.conversation_id')
-            ->where('conversation_user.user_id', $userId)
-            ->groupBy('messages.conversation_id')
-            ->orderBy('messages.id', 'DESC')
-            ->get(['messages.*', 'messages.id as message_id', 'conversation_user.*']);
+        return $this->conversation->getList($this->user, $this->perPage, $this->page, $pageName = 'page');
+    }
 
-        $messages = [];
+    public function conversations(Conversation $conversation = null)
+    {
+        $this->conversation = $conversation ? $conversation : $this->conversation;
 
-        foreach ($c as $user) {
-
-            $recent_message = $user->conversation->messages()->orderBy('id', 'desc')->first()->toArray();
-
-            $notification = MessageNotification::where('user_id', $userId)
-                ->where('message_id', $user->id)
-                ->get(['message_notification.id',
-                    'message_notification.is_seen',
-                    'message_notification.is_sender']
-                );
-
-            $messages[] = array_merge(
-                $recent_message, ['notification' => $notification]
-            );
-
-        }
-
-        return $messages;
+        return $this;
     }
 
     /**
      * Get messages in a conversation
      *
-     * @param int $userId
-     * @param int $conversationId
      * @param int $perPage
      * @param int $page
      *
      * @return Message
      */
-    public function messages($userId, $conversationId, $perPage = null, $page = null)
+    public function getMessages($perPage = null, $page = null)
     {
-        return $this->conversation($conversationId)->getMessages($userId, $perPage, $page);
+        return $this->conversation->getMessages($this->user, $perPage, $page);
     }
 
     /**
      * Deletes message
      *
-     * @param      int  $messageId
-     * @param      int  $userId     user id
-     *
      * @return     void
      */
-    public function trash($messageId, $userId)
+    public function delete()
     {
-        return $this->message->trash($messageId, $userId);
+        $this->message->trash($this->user);
     }
 
     /**
-     * clears conversation
-     *
-     * @param      int  $conversationId
-     * @param      int  $userId
+     * Clears conversation
      */
-    public function clear($conversationId, $userId)
+    public function clear()
     {
-        return $this->conversation->clear($conversationId, $userId);
+        $this->conversation->clear($this->user);
     }
 
-    public function messageRead($messageId, $userId)
+    /**
+     * Mark all messages in Conversation as read
+     *
+     * @return void
+     */
+    public function readAll()
     {
-        return $this->message->messageRead($messageId, $userId);
+        $this->conversation->readAll($this->user);
     }
 
-    public function conversationRead($conversationId, $userId)
-    {
-        $this->conversation->conversationRead($conversationId, $userId);
-    }
-
-    public function getConversationBetweenUsers($userOne, $userTwo)
+    /**
+     * Get Private Conversation between two users
+     *
+     * @param int | User $userOne
+     * @param int | User $userTwo
+     * @return Conversation
+     */
+    public function getConversationBetween($userOne, $userTwo)
     {
         $conversation1 = $this->conversation->userConversations($userOne)->toArray();
-
         $conversation2 = $this->conversation->userConversations($userTwo)->toArray();
 
         $common_conversations = $this->getConversationsInCommon($conversation1, $conversation2);
 
-        if(!$common_conversations){
+        if (!$common_conversations) {
             return null;
         }
 
         return $this->conversation->findOrFail($common_conversations[0]);
     }
 
+    /**
+     * Gets the conversations in common.
+     *
+     * @param      array $conversation1  The conversations for user one
+     * @param      array $conversation2  The conversations for user two
+     *
+     * @return     Conversation  The conversations in common.
+     */
     private function getConversationsInCommon($conversation1, $conversation2)
     {
         return array_values(array_intersect($conversation1, $conversation2));
     }
 
+    /**
+     * Returns the User Model class
+     *
+     * @return string
+     */
     public static function userModel()
     {
-        return config('chat.user_model');
+        return config('musonza_chat.user_model');
     }
 
+    public static function eventDispatcher()
+    {
+        return config('musonza_chat.event_dispatcher');
+    }
 }

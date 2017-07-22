@@ -1,9 +1,31 @@
 [![Build Status](https://travis-ci.org/musonza/chat.svg?branch=master)](https://travis-ci.org/musonza/chat)
 [![Downloads](https://img.shields.io/packagist/dt/musonza/chat.svg?style=flat-square)](https://packagist.org/packages/musonza/chat)
-[![Code Climate](https://codeclimate.com/github/musonza/chat/badges/gpa.svg)](https://codeclimate.com/github/musonza/chat)
 ## Chat 
 
-This package allows you to add a chat system to your Laravel 5 application
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Creating a conversation](#creating-a-conversation)
+  - [Get a conversation by Id](#get-a-conversation-by-id)
+  - [Send a text message](#send-a-text-message)
+  - [Send a message of custom type](#send-a-message-of-custom-type)
+  - [Mark a message as read](#mark-a-message-as-read)
+  - [Mark whole conversation as read](#mark-whole-conversation-as-read)
+  - [Delete a message](#delete-a-message)
+  - [Clear a conversation](#clear-a-conversation)
+  - [Get a conversation between two users](#get-a-conversation-between-two-users)
+  - [Remove users from a conversation](#remove-users-from-a-conversation)
+  - [Add users to a conversation](#add-users-to-a-conversation)
+  - [Get messages in a conversation](#get-messages-in-a-conversation)
+  - [Get recent messages](#get-recent-messages)
+  - [Get users in a conversation](#get-users-in-a-conversation)
+- [License](#license)
+
+## Introduction
+
+This package allows you to add a chat system to your Laravel ^5.3 application
+
+> **Note:** If you are using a Laravel version less than 5.3 [install the release on this branch instead](https://github.com/musonza/chat/tree/1.0).
 
 ## Installation
 
@@ -19,7 +41,7 @@ Add the service provider to your `config\app.php` the providers array
 Musonza\Chat\ChatServiceProvider
 ```
 
-You can use the facade for shorter code. Add this to your aliases:
+Add the Facade to your aliases:
 
 ```
 'Chat' => Musonza\Chat\Facades\ChatFacade::class to your `config\app.php`
@@ -37,89 +59,123 @@ Publish the assets:
 php artisan vendor:publish
 ```
 
-This will publish database migrations and a configuration file `chat.php` in the Laravel config folder.
+This will publish database migrations and a configuration file `musonza_chat.php` in the Laravel config folder.
+
+> **Note:** This package takes advantage of Laravel Notifications. 
+If you have already setup Laravel notifications you can delete the `2017_07_12_034227_create_notifications_table.php` migration file.
+
+Run the migrations:
+
+```
+php artisan migrate
+```
 
 ## Usage
 
-By default the package assumes you have a User model in the App namespace. However, you can update the
-user model in 'chat.php' published in the `config` folder.
+By default the package assumes you have a User model in the App namespace. 
+
+However, you can update the user model in `musonza_chat.php` published in the `config` folder.
 
 #### Creating a conversation
 ```
-$conversation = Chat::createConversation([$userId, $userId2,...]); //takes an array of user ids
+$participants = [$userId, $userId2,...];
+
+$conversation = Chat::createConversation($participants); 
 ```
 
-#### Get a conversation given a conversation_id
+#### Get a conversation by id
 ```
 $conversation = Chat::conversation($conversation_id);
 ```
 
-#### Send a message
+#### Send a text message
 
+```{php}
+$message = Chat::message('Hello')
+            ->from($users[0]->id)
+            ->to($conversation->id)
+            ->send(); 
 ```
-Chat::send($conversation->id, 'Hello', $userId); //$userId sending a message to created conversation
+#### Send a message of custom type
+
+The default message type is `text`. If you want to specify custom type you can call the `type()` function as below:
+
+```php
+$message = Chat::message('Hello')
+		->type('image')
+		->from($user->id)
+		->to($conversation->id)
+		->send(); 
 ```
 
-#### Mark message as read
 
-```
-Chat::messageRead($messageId, $userId); //$userId marks the mesage as read
+#### Mark a message as read
+
+```php
+Chat::messages($message)->for($user)->markRead();
 ```
 
 #### Mark whole conversation as read
 
 ```
-Chat::conversationRead($conversation->id, $userId);
+Chat::conversations($conversation)->for($users[0])->readAll();
 ```	
 
 #### Delete a message
 
-```
-Chat::trash($messageId, $userId);
+```php
+Chat::messages($message)->for($user)->delete();
 ```
 
 #### Clear a conversation
 
 ```
-Chat::clear($conversation->id, $userId);
+Chat::conversations($conversation)->for($user)->clear();
 ```
 
-#### Get conversation for two users
+#### Get a conversation between two users
 
 ```
-Chat::getConversationBetweenUsers($userId, $userId2);
+Chat::getConversationBetween($user1, $user2);
 ```
 
-#### Remove user(s) from conversation
+#### Remove users from a conversation
 
 ```
-Chat::removeParticipants($conversation->id, $usersId); //removing one user
-```
-
-```
-Chat::removeParticipants($conversation->id, [$usersId, $userId2]); //removing multiple users
-```
-
-#### Add user(s) to a conversation
-
-```
-Chat::addParticipants($conversation->id, $userId3); //add one user
+/* removing one user */
+Chat::removeParticipants($conversation, $user);
 ```
 
 ```
-Chat::addParticipants($conversation->id, [$userId3, $userId4]); //add multiple users
+/* removing multiple users */
+Chat::removeParticipants($conversation, [$user1, $user2, $user3,...,$userN]);
 ```
+
+#### Add users to a conversation
+
+```
+/* add one user */
+Chat::addParticipants($conversation->id, $user->id); 
+```
+
+```
+/* add multiple users */
+Chat::addParticipants($conversation->id, [$user3, $user4]);
+```
+
+<b>Note:</b> A third user will classify the conversation as not private if it was.
+
 
 #### Get messages in a conversation
 
 ```
-Chat::messages($userId, $conversation->id, $perPage, $page);
+Chat::conversations($conversation)->for($users)->getMessages($perPage, $page)
 ```
 
 #### Get recent messages 
 
 ```
-$mesages = Chat::conversations($userId);
+$messages = Chat::conversations()->for($users)->limit(25)->page(1)->get();
 ```
 
 #### Get users in a conversation
@@ -128,6 +184,9 @@ $mesages = Chat::conversations($userId);
 $users = $conversation->users;
 ```
 
+## License
+
+Chat is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
 
 
 

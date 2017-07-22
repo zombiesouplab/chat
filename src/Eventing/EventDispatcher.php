@@ -2,35 +2,18 @@
 
 namespace Musonza\Chat\Eventing;
 
-use Illuminate\Events\Dispatcher;
-use Illuminate\Log\Writer;
+use Musonza\Chat\Chat;
 
 class EventDispatcher
 {
     protected $event;
 
-    protected $log;
-
-    public function __construct(Dispatcher $event, Writer $log)
-    {
-        $this->event = $event;
-        $this->log = $log;
-    }
-
     public function dispatch(array $events)
     {
-        foreach ($events as $event) {
+        $customDispatcher = Chat::eventDispatcher();
 
-            $eventName = $this->getEventName($event);
-
-            $this->event->fire($eventName, $event);
-
-            //$this->log->info("$eventName was fired.");
+        if ($customDispatcher && class_exists($customDispatcher)) {
+            app($customDispatcher)->dispatch($events);
         }
-    }
-
-    public function getEventName($event)
-    {
-        return str_replace('\\', '.', get_class($event));
     }
 }

@@ -3,17 +3,22 @@
 namespace Musonza\Chat\Messages;
 
 use Eloquent;
+use Illuminate\Notifications\Notification;
+use Musonza\Chat\Chat;
 use Musonza\Chat\Conversations\Conversation;
 use Musonza\Chat\Eventing\EventGenerator;
-use Musonza\Chat\Chat;
-use Musonza\Chat\Notifications\MessageNotification;
 
 class Message extends Eloquent
 {
     protected $fillable = ['body', 'user_id', 'type'];
 
-    protected $table = 'messages';
-    
+    protected $table = 'mc_messages';
+
+    /**
+     * All of the relationships to be touched.
+     *
+     * @var array
+     */
     protected $touches = ['conversation'];
 
     use EventGenerator;
@@ -21,6 +26,11 @@ class Message extends Eloquent
     public function sender()
     {
         return $this->belongsTo(Chat::userModel(), 'user_id');
+    }
+
+    public function notifications()
+    {
+        return \DB::table('notifications')->all();
     }
 
     public function conversation()
@@ -48,36 +58,49 @@ class Message extends Eloquent
 
         $this->raise(new MessageWasSent($message));
 
-        return $this;
+        return $message;
     }
 
     /**
      * Deletes a message
      *
-     * @param      integer  $messageId
-     * @param      integer  $userId
+     * @param      Message $message
+     * @param      User  $user
      *
      * @return
      */
-    public function trash($messageId, $userId)
+    public function trash($user)
     {
-        return MessageNotification::where('user_id', $userId)
-            ->where('message_id', $messageId)
+        return $user->notifications()
+            ->where('data->message_id', $this->id)
             ->delete();
+    }
+
+    /**
+     * Return user notification for specific message
+     * @param $user
+     *
+     * @return Notification
+     */
+    public function getNotification($user)
+    {
+        return $user->notifications->filter(function ($item) use ($user) {
+            return $item->type == 'Musonza\Chat\Notifications\MessageSent' &&
+            $item->data['message_id'] == $this->id &&
+            $item->data['conversation_id'] == $this->conversation_id &&
+            $item->notifiable_id == $user->id;
+        })->first();
     }
 
     /**
      * marks message as read
      *
-     * @param      integer  $messageId
-     * @param      integer  $userId
+     * @param      User  $user
      *
-     * @return
+     * @return void
      */
-    public function messageRead($messageId, $userId)
+    public function markRead($user)
     {
-        return MessageNotification::where('user_id', $userId)
-            ->where('message_id', $messageId)
-            ->update(['is_seen' => 1]);
+        $this->getNotification($user)->markAsRead();
     }
 }
