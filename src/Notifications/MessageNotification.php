@@ -3,28 +3,25 @@
 namespace Musonza\Chat\Notifications;
 
 use Illuminate\Support\Facades\Notification;
-use Musonza\Chat\Chat;
 use Musonza\Chat\Conversations\Conversation;
 use Musonza\Chat\Messages\Message;
-use Musonza\Chat\Notifications\MessageSent;
 
 class MessageNotification
 {
     /**
-     * Creates a new notification
+     * Creates a new notification.
      *
-     * @param      Message       $message
-     * @param      Conversation  $conversation
+     * @param Message      $message
+     * @param Conversation $conversation
      */
     public static function make(Message $message, Conversation $conversation)
     {
         $recipients = $conversation->users->filter(function ($user) use ($message, $conversation) {
-
             if ($message->user_id === $user->id) {
                 $user->notify(new MessageSent([
-                    'message_id' => $message->id,
+                    'message_id'      => $message->id,
                     'conversation_id' => $conversation->id,
-                    'outgoing' => true,
+                    'outgoing'        => true,
                 ]));
             }
 
@@ -32,7 +29,7 @@ class MessageNotification
         });
 
         Notification::send($recipients, new MessageSent([
-            'message_id' => $message->id,
+            'message_id'      => $message->id,
             'conversation_id' => $conversation->id,
         ]));
     }
