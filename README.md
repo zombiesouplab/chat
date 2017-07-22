@@ -1,4 +1,5 @@
 [![Downloads](https://img.shields.io/packagist/dt/musonza/chat.svg?style=flat-square)](https://packagist.org/packages/musonza/chat)
+[![StyleCI](https://styleci.io/repos/54214978/shield?branch=master)](https://styleci.io/repos/54214978)
 ## Chat 
 
 - [Introduction](#introduction)
