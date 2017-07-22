@@ -2,13 +2,19 @@
 
 namespace Musonza\Chat\Conversations;
 
-use Eloquent;
 use Musonza\Chat\Chat;
-use Musonza\Chat\Notifications\MessageNotification;
+use Musonza\Chat\Messages\Message;
+use Musonza\Chat\Model;
 
-class Conversation extends Eloquent
+class Conversation extends Model
 {
-    protected $fillable = [];
+    protected $table = 'mc_conversations';
+
+    protected $fillable = ['data'];
+
+    protected $casts = [
+        'data' => 'array',
+    ];
 
     /**
      * Conversation participants
@@ -17,7 +23,17 @@ class Conversation extends Eloquent
      */
     public function users()
     {
-        return $this->belongsToMany(Chat::userModel(), 'conversation_user')->withTimestamps();
+        return $this->belongsToMany(Chat::userModel(), 'mc_conversation_user')->withTimestamps();
+    }
+
+    /**
+     * Return the recent message in a Conversation
+     *
+     * @return  Message
+     */
+    public function last_message()
+    {
+        return $this->hasOne(Message::class)->orderBy('mc_messages.id', 'desc')->with('sender');
     }
 
     /**
@@ -27,29 +43,59 @@ class Conversation extends Eloquent
      */
     public function messages()
     {
-        return $this->hasMany('Musonza\Chat\Messages\Message', 'conversation_id')->with('sender');
+        return $this->hasMany(Message::class, 'conversation_id')->with('sender');
     }
 
     /**
-     * Get recent user messages for each conversation
+     * Get messages for a conversation
      *
-     * @param      integer   $userId
+     * @param      User   $user
      * @param      integer  $perPage
      * @param      integer  $page
      * @param      string   $sorting
      * @param      array    $columns
      * @param      string   $pageName
      *
-     * @return     <type>
+     * @return     Message
      */
-    public function getMessages($userId, $perPage = 25, $page = 1, $sorting = 'asc', $columns = ['*'], $pageName = 'page')
+    public function getMessages($user, $perPage = 25, $page = 1, $sorting = 'asc', $columns = ['*'], $pageName = 'page')
     {
         return $this->messages()
-            ->join('message_notification', 'message_notification.message_id', '=', 'messages.id')
-            ->whereNull('message_notification.deleted_at')
-            ->where('message_notification.user_id', $userId)
-            ->orderBy('messages.id', $sorting)
-            ->paginate($perPage, $columns, $pageName, $page);
+            ->join('notifications', 'notifications.data->message_id', '=', 'mc_messages.id')
+            ->where('notifications.notifiable_id', $user->id)
+            ->orderBy('mc_messages.id', $sorting)
+            ->paginate(
+                $perPage,
+                ['notifications.read_at', 'notifications.notifiable_id', 'notifications.id as notification_id',
+                    'mc_messages.*'],
+                $pageName,
+                $page
+            );
+    }
+
+    /**
+     * Gets the list of conversations.
+     *
+     * @param      User   $user      The user
+     * @param      integer  $perPage   The per page
+     * @param      integer  $page      The page
+     * @param      string   $pageName  The page name
+     *
+     * @return     Conversations   The list.
+     */
+    public function getList($user, $perPage = 25, $page = 1, $pageName = 'page')
+    {
+        return $this->join('mc_conversation_user', 'mc_conversation_user.conversation_id', '=', 'mc_conversations.id')
+            ->with([
+                'last_message' => function ($query) {
+                    $query->join('notifications', 'notifications.data->message_id', '=', 'mc_messages.id')
+                        ->select('notifications.*', 'mc_messages.*');
+                },
+            ])
+            ->where('mc_conversation_user.user_id', $user->id)
+            ->orderBy('mc_conversations.updated_at', 'DESC')
+            ->distinct('mc_conversations.id')
+            ->paginate($perPage, ['mc_conversations.*'], $pageName, $page);
     }
 
     /**
@@ -79,20 +125,20 @@ class Conversation extends Eloquent
     /**
      * Remove user from conversation
      *
-     * @param  User  $userId
-     * @return void
+     * @param  $users
+     * @return Conversation
      */
-    public function removeUsers($userId)
+    public function removeUsers($users)
     {
-        if (is_array($userId)) {
-            foreach ($userId as $id) {
+        if (is_array($users)) {
+            foreach ($users as $id) {
                 $this->users()->detach($id);
             }
 
             return $this;
         }
 
-        $this->users()->detach($userId);
+        $this->users()->detach($users);
 
         return $this;
     }
@@ -128,37 +174,57 @@ class Conversation extends Eloquent
     /**
      * Gets conversations for a specific user
      *
-     * @param      integer  $userId
+     * @param      User | int  $user
      *
      * @return     array
      */
-    public function userConversations($userId)
+    public function userConversations($user)
     {
-        return $this->join('conversation_user', 'conversation_user.conversation_id', '=', 'conversations.id')
-            ->where('conversation_user.user_id', $userId)
+        $userId = is_object($user) ? $user->id : $user;
+
+        return $this->join('mc_conversation_user', 'mc_conversation_user.conversation_id', '=', 'mc_conversations.id')
+            ->where('mc_conversation_user.user_id', $userId)
             ->where('private', true)
-            ->pluck('conversations.id');
+            ->pluck('mc_conversations.id');
+    }
+
+    /**
+     * Gets the notifications.
+     *
+     * @param      User  $user   The user
+     *
+     * @return     Notifications  The notifications.
+     */
+    public function getNotifications($user)
+    {
+        return $user->notifications->filter(function ($item) use ($user) {
+            return $item->type == 'Musonza\Chat\Notifications\MessageSent' &&
+            $item->data['conversation_id'] == $this->id &&
+            $item->notifiable_id == $user->id;
+        });
     }
 
     /**
      * Clears user conversation
      *
-     * @param      integer  $conversationId
-     * @param      integer  $userId
+     * @param     User  $user
      *
      * @return
      */
-    public function clear($conversationId, $userId)
+    public function clear($user)
     {
-        return MessageNotification::where('user_id', $userId)
-            ->where('conversation_id', $conversationId)
+        return $user->notifications()
+            ->where('data->conversation_id', $this->id)
             ->delete();
     }
 
-    public function conversationRead($conversationId, $userId)
+    /**
+     * Marks all the messages in a conversation as read
+     *
+     * @param $user
+     */
+    public function readAll($user)
     {
-        return MessageNotification::where('user_id', $userId)
-            ->where('conversation_id', $conversationId)
-            ->update(['is_seen' => 1]);
+        $this->getNotifications($user)->markAsRead();
     }
 }
