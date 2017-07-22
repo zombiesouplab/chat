@@ -11,10 +11,10 @@ class SendMessageCommand
     public $conversation;
 
     /**
-     * @param      \Musonza\Chat\Conversations\Conversation  $conversation  The conversation
-     * @param      string                                    $body          The body
-     * @param      int                                       $senderId      The sender identifier
-     * @param      string                                    $type          The type
+     * @param \Musonza\Chat\Conversations\Conversation $conversation The conversation
+     * @param string                                   $body         The body
+     * @param int                                      $senderId     The sender identifier
+     * @param string                                   $type         The type
      */
     public function __construct(Conversation $conversation, $body, $senderId, $type = 'text')
     {

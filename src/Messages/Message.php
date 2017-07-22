@@ -39,21 +39,21 @@ class Message extends Eloquent
     }
 
     /**
-     * Adds a message to a conversation
+     * Adds a message to a conversation.
      *
-     * @param      Conversation  $conversation
-     * @param      string        $body
-     * @param      integer        $userId
-     * @param      string        $type
+     * @param Conversation $conversation
+     * @param string       $body
+     * @param int          $userId
+     * @param string       $type
      *
-     * @return     Message
+     * @return Message
      */
     public function send(Conversation $conversation, $body, $userId, $type = 'text')
     {
         $message = $conversation->messages()->create([
-            'body' => $body,
+            'body'    => $body,
             'user_id' => $userId,
-            'type' => $type,
+            'type'    => $type,
         ]);
 
         $this->raise(new MessageWasSent($message));
@@ -62,10 +62,10 @@ class Message extends Eloquent
     }
 
     /**
-     * Deletes a message
+     * Deletes a message.
      *
-     * @param      Message $message
-     * @param      User  $user
+     * @param Message $message
+     * @param User    $user
      *
      * @return
      */
@@ -77,7 +77,8 @@ class Message extends Eloquent
     }
 
     /**
-     * Return user notification for specific message
+     * Return user notification for specific message.
+     *
      * @param $user
      *
      * @return Notification
@@ -93,9 +94,9 @@ class Message extends Eloquent
     }
 
     /**
-     * marks message as read
+     * marks message as read.
      *
-     * @param      User  $user
+     * @param User $user
      *
      * @return void
      */

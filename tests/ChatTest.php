@@ -21,7 +21,7 @@ class ChatTest extends TestCase
 
         $conversation = Chat::createConversation([$users[0]->id, $users[1]->id]);
 
-        $this->assertDatabaseHas($this->prefix . 'conversations', ['id' => 1]);
+        $this->assertDatabaseHas($this->prefix.'conversations', ['id' => 1]);
     }
 
     /** @test */
@@ -134,12 +134,12 @@ class ChatTest extends TestCase
 
         $conversation = Chat::createConversation([$users[0]->id, $users[1]->id]);
 
-        $data = ["title" => "PHP Channel", "description" => "PHP Channel Description"];
+        $data = ['title' => 'PHP Channel', 'description' => 'PHP Channel Description'];
 
         $conversation->update(['data' => $data]);
 
-        $this->assertEquals("PHP Channel", $conversation->data['title']);
-        $this->assertEquals("PHP Channel Description", $conversation->data['description']);
+        $this->assertEquals('PHP Channel', $conversation->data['title']);
+        $this->assertEquals('PHP Channel Description', $conversation->data['description']);
     }
 
     /** @test  */
@@ -289,8 +289,8 @@ class ChatTest extends TestCase
         $conversation = Chat::createConversation([$users[0]->id, $users[1]->id]);
 
         for ($i = 0; $i < 3; $i++) {
-            Chat::message('Hello ' . $i)->from($users[0])->to($conversation)->send();
-            Chat::message('Hello Man ' . $i)->from($users[1])->to($conversation)->send();
+            Chat::message('Hello '.$i)->from($users[0])->to($conversation)->send();
+            Chat::message('Hello Man '.$i)->from($users[1])->to($conversation)->send();
         }
 
         Chat::message('Hello Man')->from($users[1])->to($conversation)->send();
@@ -329,7 +329,6 @@ class ChatTest extends TestCase
         $message7 = Chat::message('Hello Man 10')->from($users[0])->to($conversation2)->send();
 
         $this->assertEquals($message7->id, $conversation2->last_message->id);
-
     }
 
     /** @test */
