@@ -9,9 +9,9 @@ class ConversationUser extends Eloquent
     protected $table = 'mc_conversation_user';
 
     /**
-     * Conversation
+     * Conversation.
      *
-     * @return   Relationship
+     * @return Relationship
      */
     public function conversation()
     {

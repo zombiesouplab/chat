@@ -17,7 +17,7 @@ class Conversation extends Model
     ];
 
     /**
-     * Conversation participants
+     * Conversation participants.
      *
      * @return User
      */
@@ -27,9 +27,9 @@ class Conversation extends Model
     }
 
     /**
-     * Return the recent message in a Conversation
+     * Return the recent message in a Conversation.
      *
-     * @return  Message
+     * @return Message
      */
     public function last_message()
     {
@@ -37,7 +37,7 @@ class Conversation extends Model
     }
 
     /**
-     * Messages in conversation
+     * Messages in conversation.
      *
      * @return Message
      */
@@ -47,16 +47,16 @@ class Conversation extends Model
     }
 
     /**
-     * Get messages for a conversation
+     * Get messages for a conversation.
      *
-     * @param      User   $user
-     * @param      integer  $perPage
-     * @param      integer  $page
-     * @param      string   $sorting
-     * @param      array    $columns
-     * @param      string   $pageName
+     * @param User   $user
+     * @param int    $perPage
+     * @param int    $page
+     * @param string $sorting
+     * @param array  $columns
+     * @param string $pageName
      *
-     * @return     Message
+     * @return Message
      */
     public function getMessages($user, $perPage = 25, $page = 1, $sorting = 'asc', $columns = ['*'], $pageName = 'page')
     {
@@ -67,7 +67,7 @@ class Conversation extends Model
             ->paginate(
                 $perPage,
                 ['notifications.read_at', 'notifications.notifiable_id', 'notifications.id as notification_id',
-                    'mc_messages.*'],
+                    'mc_messages.*', ],
                 $pageName,
                 $page
             );
@@ -76,12 +76,12 @@ class Conversation extends Model
     /**
      * Gets the list of conversations.
      *
-     * @param      User   $user      The user
-     * @param      integer  $perPage   The per page
-     * @param      integer  $page      The page
-     * @param      string   $pageName  The page name
+     * @param User   $user     The user
+     * @param int    $perPage  The per page
+     * @param int    $page     The page
+     * @param string $pageName The page name
      *
-     * @return     Conversations   The list.
+     * @return Conversations The list.
      */
     public function getList($user, $perPage = 25, $page = 1, $pageName = 'page')
     {
@@ -99,9 +99,10 @@ class Conversation extends Model
     }
 
     /**
-     * Add user to conversation
+     * Add user to conversation.
      *
-     * @param  integer  $userId
+     * @param int $userId
+     *
      * @return void
      */
     public function addParticipants($userIds)
@@ -123,9 +124,10 @@ class Conversation extends Model
     }
 
     /**
-     * Remove user from conversation
+     * Remove user from conversation.
      *
      * @param  $users
+     *
      * @return Conversation
      */
     public function removeUsers($users)
@@ -144,11 +146,11 @@ class Conversation extends Model
     }
 
     /**
-     * Starts a new conversation
+     * Starts a new conversation.
      *
-     * @param      array  $participants  users
+     * @param array $participants users
      *
-     * @return     Conversation
+     * @return Conversation
      */
     public function start($participants)
     {
@@ -162,9 +164,9 @@ class Conversation extends Model
     }
 
     /**
-     * Get number of users in a conversation
+     * Get number of users in a conversation.
      *
-     * @return     integer
+     * @return int
      */
     public function userCount()
     {
@@ -172,11 +174,11 @@ class Conversation extends Model
     }
 
     /**
-     * Gets conversations for a specific user
+     * Gets conversations for a specific user.
      *
-     * @param      User | int  $user
+     * @param User | int $user
      *
-     * @return     array
+     * @return array
      */
     public function userConversations($user)
     {
@@ -191,9 +193,9 @@ class Conversation extends Model
     /**
      * Gets the notifications.
      *
-     * @param      User  $user   The user
+     * @param User $user The user
      *
-     * @return     Notifications  The notifications.
+     * @return Notifications The notifications.
      */
     public function getNotifications($user)
     {
@@ -205,9 +207,9 @@ class Conversation extends Model
     }
 
     /**
-     * Clears user conversation
+     * Clears user conversation.
      *
-     * @param     User  $user
+     * @param User $user
      *
      * @return
      */
@@ -219,7 +221,7 @@ class Conversation extends Model
     }
 
     /**
-     * Marks all the messages in a conversation as read
+     * Marks all the messages in a conversation as read.
      *
      * @param $user
      */

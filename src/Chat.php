@@ -10,30 +10,30 @@ use Musonza\Chat\Messages\SendMessageCommand;
 class Chat
 {
     /**
-     * Type of message being sent
+     * Type of message being sent.
      *
-     * @var        string
+     * @var string
      */
     protected $type = 'text';
 
     /**
-     * Message sender
+     * Message sender.
      *
      * @var int | User
      */
     protected $from;
 
     /**
-     * Message recipient
+     * Message recipient.
      *
      * @var Conversation id
      */
     protected $to;
 
     /**
-     * Message content
+     * Message content.
      *
-     * @var        string
+     * @var string
      */
     protected $body;
 
@@ -42,9 +42,9 @@ class Chat
     protected $page = 1;
 
     /**
-     * @param      \Musonza\Chat\Conversations\Conversation  $conversation  The conversation
-     * @param      \Musonza\Chat\Messages\Message            $message       The message
-     * @param      \Musonza\Chat\Commanding\CommandBus       $commandBus    The command bus
+     * @param \Musonza\Chat\Conversations\Conversation $conversation The conversation
+     * @param \Musonza\Chat\Messages\Message           $message      The message
+     * @param \Musonza\Chat\Commanding\CommandBus      $commandBus   The command bus
      */
     public function __construct(Conversation $conversation, Message $message, CommandBus $commandBus)
     {
@@ -54,7 +54,7 @@ class Chat
     }
 
     /**
-     * Creates a new conversation
+     * Creates a new conversation.
      *
      * @param array $participants
      * @param array $data
@@ -67,7 +67,7 @@ class Chat
     }
 
     /**
-     * Returns a conversation
+     * Returns a conversation.
      *
      * @param int $conversationId
      *
@@ -79,10 +79,10 @@ class Chat
     }
 
     /**
-     * Add user(s) to a conversation
+     * Add user(s) to a conversation.
      *
      * @param Conversation $conversation
-     * @param int | array $userId / array of user ids or an integer
+     * @param int | array  $userId       / array of user ids or an integer
      *
      * @return Conversation
      */
@@ -92,9 +92,10 @@ class Chat
     }
 
     /**
-     * Set the message
+     * Set the message.
      *
      * @param Message $message
+     *
      * @return $this
      */
     public function messages(Message $message)
@@ -105,9 +106,10 @@ class Chat
     }
 
     /**
-     * Set the limit
+     * Set the limit.
      *
      * @param int $limit
+     *
      * @return $this
      */
     public function limit($limit)
@@ -118,30 +120,35 @@ class Chat
     }
 
     /**
-     * Set current page for pagination
+     * Set current page for pagination.
      *
      * @param int $page
+     *
      * @return $this
      */
     public function page($page)
     {
         $this->page = $page ? $page : $this->page;
+
         return $this;
     }
 
     /**
-     * Sets user
+     * Sets user.
      *
      * @param object $user
+     *
      * @return $this
      */
-    function for ($user) {
+    public function for($user)
+    {
         $this->user = $user;
+
         return $this;
     }
 
     /**
-     * Mark a message as read
+     * Mark a message as read.
      *
      * @return void
      */
@@ -151,7 +158,7 @@ class Chat
     }
 
     /**
-     * Set Sender
+     * Set Sender.
      *
      * @param int $from
      *
@@ -160,11 +167,12 @@ class Chat
     public function from($from)
     {
         $this->from = is_object($from) ? $from->id : $from;
+
         return $this;
     }
 
     /**
-     * Set Message type
+     * Set Message type.
      *
      * @param string type
      *
@@ -173,11 +181,12 @@ class Chat
     public function type(String $type)
     {
         $this->type = $type;
+
         return $this;
     }
 
     /**
-     * Sets Receiver
+     * Sets Receiver.
      *
      * @param Conversation $to
      *
@@ -191,9 +200,10 @@ class Chat
     }
 
     /**
-     * Sets message body
+     * Sets message body.
      *
      * @param string $body
+     *
      * @return $this
      */
     public function message(String $body)
@@ -204,7 +214,7 @@ class Chat
     }
 
     /**
-     * Sends the message
+     * Sends the message.
      *
      * @return void
      */
@@ -228,7 +238,7 @@ class Chat
     }
 
     /**
-     * Remove user(s) from a conversation
+     * Remove user(s) from a conversation.
      *
      * @param Conversation $conversation
      * @param $users / array of user ids or an integer
@@ -241,9 +251,9 @@ class Chat
     }
 
     /**
-     * Get Conversations with lastest message
+     * Get Conversations with lastest message.
      *
-     * @param Object $user
+     * @param object $user
      *
      * @return Illuminate\Pagination\LengthAwarePaginator
      */
@@ -260,7 +270,7 @@ class Chat
     }
 
     /**
-     * Get messages in a conversation
+     * Get messages in a conversation.
      *
      * @param int $perPage
      * @param int $page
@@ -273,9 +283,9 @@ class Chat
     }
 
     /**
-     * Deletes message
+     * Deletes message.
      *
-     * @return     void
+     * @return void
      */
     public function delete()
     {
@@ -283,7 +293,7 @@ class Chat
     }
 
     /**
-     * Clears conversation
+     * Clears conversation.
      */
     public function clear()
     {
@@ -291,7 +301,7 @@ class Chat
     }
 
     /**
-     * Mark all messages in Conversation as read
+     * Mark all messages in Conversation as read.
      *
      * @return void
      */
@@ -301,10 +311,11 @@ class Chat
     }
 
     /**
-     * Get Private Conversation between two users
+     * Get Private Conversation between two users.
      *
      * @param int | User $userOne
      * @param int | User $userTwo
+     *
      * @return Conversation
      */
     public function getConversationBetween($userOne, $userTwo)
@@ -315,7 +326,7 @@ class Chat
         $common_conversations = $this->getConversationsInCommon($conversation1, $conversation2);
 
         if (!$common_conversations) {
-            return null;
+            return;
         }
 
         return $this->conversation->findOrFail($common_conversations[0]);
@@ -324,10 +335,10 @@ class Chat
     /**
      * Gets the conversations in common.
      *
-     * @param      array $conversation1  The conversations for user one
-     * @param      array $conversation2  The conversations for user two
+     * @param array $conversation1 The conversations for user one
+     * @param array $conversation2 The conversations for user two
      *
-     * @return     Conversation  The conversations in common.
+     * @return Conversation The conversations in common.
      */
     private function getConversationsInCommon($conversation1, $conversation2)
     {
@@ -335,7 +346,7 @@ class Chat
     }
 
     /**
-     * Returns the User Model class
+     * Returns the User Model class.
      *
      * @return string
      */

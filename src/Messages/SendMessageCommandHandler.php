@@ -11,9 +11,8 @@ class SendMessageCommandHandler implements CommandHandler
     protected $dispatcher;
 
     /**
-     *
-     * @param      \Musonza\Chat\Eventing\EventDispatcher  $dispatcher  The dispatcher
-     * @param      Message                                 $message     The message
+     * @param \Musonza\Chat\Eventing\EventDispatcher $dispatcher The dispatcher
+     * @param Message                                $message    The message
      */
     public function __construct(EventDispatcher $dispatcher, Message $message)
     {
@@ -22,11 +21,11 @@ class SendMessageCommandHandler implements CommandHandler
     }
 
     /**
-     * Triggers sending the message
+     * Triggers sending the message.
      *
      * @param  $command  The command
      *
-     * @return   Message
+     * @return Message
      */
     public function handle($command)
     {
