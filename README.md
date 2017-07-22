@@ -90,10 +90,10 @@ $conversation = Chat::conversation($conversation_id);
 
 #### Send a text message
 
-```{php}
+```php
 $message = Chat::message('Hello')
-            ->from($users[0]->id)
-            ->to($conversation->id)
+            ->from($user)
+            ->to($conversation)
             ->send(); 
 ```
 #### Send a message of custom type
@@ -103,8 +103,8 @@ The default message type is `text`. If you want to specify custom type you can c
 ```php
 $message = Chat::message('Hello')
 		->type('image')
-		->from($user->id)
-		->to($conversation->id)
+		->from($user)
+		->to($conversation)
 		->send(); 
 ```
 
@@ -117,8 +117,8 @@ Chat::messages($message)->for($user)->markRead();
 
 #### Mark whole conversation as read
 
-```
-Chat::conversations($conversation)->for($users[0])->readAll();
+```php
+Chat::conversations($conversation)->for($user)->readAll();
 ```	
 
 #### Delete a message
@@ -129,38 +129,38 @@ Chat::messages($message)->for($user)->delete();
 
 #### Clear a conversation
 
-```
+```php
 Chat::conversations($conversation)->for($user)->clear();
 ```
 
 #### Get a conversation between two users
 
-```
+```php
 Chat::getConversationBetween($user1, $user2);
 ```
 
 #### Remove users from a conversation
 
-```
+```php
 /* removing one user */
 Chat::removeParticipants($conversation, $user);
 ```
 
-```
+```php
 /* removing multiple users */
 Chat::removeParticipants($conversation, [$user1, $user2, $user3,...,$userN]);
 ```
 
 #### Add users to a conversation
 
-```
+```php
 /* add one user */
-Chat::addParticipants($conversation->id, $user->id); 
+Chat::addParticipants($conversation, $user); 
 ```
 
-```
+```php
 /* add multiple users */
-Chat::addParticipants($conversation->id, [$user3, $user4]);
+Chat::addParticipants($conversation, [$user3, $user4]);
 ```
 
 <b>Note:</b> A third user will classify the conversation as not private if it was.
@@ -168,19 +168,19 @@ Chat::addParticipants($conversation->id, [$user3, $user4]);
 
 #### Get messages in a conversation
 
-```
-Chat::conversations($conversation)->for($users)->getMessages($perPage, $page)
+```php
+Chat::conversations($conversation)->for($user)->getMessages($perPage, $page)
 ```
 
 #### Get recent messages 
 
-```
-$messages = Chat::conversations()->for($users)->limit(25)->page(1)->get();
+```php
+$messages = Chat::conversations()->for($user)->limit(25)->page(1)->get();
 ```
 
 #### Get users in a conversation
 
-```
+```php
 $users = $conversation->users;
 ```
 
