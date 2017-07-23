@@ -79,7 +79,7 @@ class Chat
     }
 
     /**
-     * Returns a message
+     * Returns a message.
      *
      * @param int $messageId
      *
@@ -152,7 +152,8 @@ class Chat
      *
      * @return $this
      */
-    function for ($user) {
+    public function for($user)
+    {
         $this->user = $user;
 
         return $this;

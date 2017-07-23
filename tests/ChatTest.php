@@ -21,7 +21,7 @@ class ChatTest extends TestCase
 
         $conversation = Chat::createConversation([$users[0]->id, $users[1]->id]);
 
-        $this->assertDatabaseHas($this->prefix . 'conversations', ['id' => 1]);
+        $this->assertDatabaseHas($this->prefix.'conversations', ['id' => 1]);
     }
 
     /** @test */
@@ -306,8 +306,8 @@ class ChatTest extends TestCase
         $conversation = Chat::createConversation([$users[0]->id, $users[1]->id]);
 
         for ($i = 0; $i < 3; $i++) {
-            Chat::message('Hello ' . $i)->from($users[0])->to($conversation)->send();
-            Chat::message('Hello Man ' . $i)->from($users[1])->to($conversation)->send();
+            Chat::message('Hello '.$i)->from($users[0])->to($conversation)->send();
+            Chat::message('Hello Man '.$i)->from($users[1])->to($conversation)->send();
         }
 
         Chat::message('Hello Man')->from($users[1])->to($conversation)->send();
