@@ -21,7 +21,7 @@ class ChatTest extends TestCase
 
         $conversation = Chat::createConversation([$users[0]->id, $users[1]->id]);
 
-        $this->assertDatabaseHas($this->prefix.'conversations', ['id' => 1]);
+        $this->assertDatabaseHas($this->prefix . 'conversations', ['id' => 1]);
     }
 
     /** @test */
@@ -49,6 +49,23 @@ class ChatTest extends TestCase
             ->send();
 
         $this->assertEquals($conversation->messages->count(), 1);
+    }
+
+    /** @test */
+    public function it_returns_a_message_given_the_id()
+    {
+        $users = $this->createUsers(2);
+
+        $conversation = Chat::createConversation([$users[0]->id, $users[1]->id]);
+
+        $message = Chat::message('Hello')
+            ->from($users[0])
+            ->to($conversation)
+            ->send();
+
+        $m = Chat::messageWithId($message->id);
+
+        $this->assertEquals($message->id, $m->id);
     }
 
     /** @test */
@@ -289,8 +306,8 @@ class ChatTest extends TestCase
         $conversation = Chat::createConversation([$users[0]->id, $users[1]->id]);
 
         for ($i = 0; $i < 3; $i++) {
-            Chat::message('Hello '.$i)->from($users[0])->to($conversation)->send();
-            Chat::message('Hello Man '.$i)->from($users[1])->to($conversation)->send();
+            Chat::message('Hello ' . $i)->from($users[0])->to($conversation)->send();
+            Chat::message('Hello Man ' . $i)->from($users[1])->to($conversation)->send();
         }
 
         Chat::message('Hello Man')->from($users[1])->to($conversation)->send();

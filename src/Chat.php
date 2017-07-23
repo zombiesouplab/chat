@@ -79,6 +79,18 @@ class Chat
     }
 
     /**
+     * Returns a message
+     *
+     * @param int $messageId
+     *
+     * @return Message
+     */
+    public function messageWithId($messageId)
+    {
+        return $this->message->findOrFail($messageId);
+    }
+
+    /**
      * Add user(s) to a conversation.
      *
      * @param Conversation $conversation
@@ -140,8 +152,7 @@ class Chat
      *
      * @return $this
      */
-    public function for($user)
-    {
+    function for ($user) {
         $this->user = $user;
 
         return $this;
