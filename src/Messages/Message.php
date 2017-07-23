@@ -51,9 +51,9 @@ class Message extends Eloquent
     public function send(Conversation $conversation, $body, $userId, $type = 'text')
     {
         $message = $conversation->messages()->create([
-            'body' => $body,
+            'body'    => $body,
             'user_id' => $userId,
-            'type' => $type,
+            'type'    => $type,
         ]);
 
         $this->raise(new MessageWasSent($message));
