@@ -101,7 +101,7 @@ $message = Chat::message('Hello')
 The default message type is `text`. If you want to specify custom type you can call the `type()` function as below:
 
 ```php
-$message = Chat::message('Hello')
+$message = Chat::message('http://example.com/img')
 		->type('image')
 		->from($user)
 		->to($conversation)
