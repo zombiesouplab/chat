@@ -28,5 +28,12 @@
         "psr-4": {
             "Musonza\\Chat\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Musonza\\Chat\\ChatServiceProvider"
+            ]
+        }
     }
 }
