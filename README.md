@@ -1,4 +1,6 @@
-[![Downloads](https://img.shields.io/packagist/dt/musonza/chat.svg?style=flat-square)](https://packagist.org/packages/musonza/chat)
+[![Downloads](https://img.shields.io/packagist/dt/musonza/chat.svg)](https://packagist.org/packages/musonza/chat)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://packagist.org/packages/musonza/chat)
+[![Packagist](https://img.shields.io/packagist/v/musonza/chat.svg)]()
 [![StyleCI](https://styleci.io/repos/54214978/shield?branch=master)](https://styleci.io/repos/54214978)
 ## Chat 
 
