@@ -145,9 +145,7 @@ Chat::getConversationBetween($user1, $user2);
 ```php
 $conversations = Chat::commonConversations($users);
 ```
-$users can be an array of user ids ex. [1,4,6]
-
-OR a collection (\Illuminate\Database\Eloquent\Collection) of users
+`$users` can be an array of user ids ex. `[1,4,6]` or a collection `(\Illuminate\Database\Eloquent\Collection)` of users
 
 #### Remove users from a conversation
 
