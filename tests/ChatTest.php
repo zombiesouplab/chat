@@ -391,7 +391,7 @@ class ChatTest extends TestCase
         Chat::message('Hello Man 6')->from($users[0])->to($conversation3)->send();
         Chat::message('Hello Man 3')->from($users[2])->to($conversation2)->send();
 
-        $users = \App\User::whereIn('id', [1,2,4])->get();
+        $users = \App\User::whereIn('id', [1, 2, 4])->get();
 
         $conversations = Chat::commonConversations($users);
 
