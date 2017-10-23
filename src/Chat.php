@@ -323,6 +323,17 @@ class Chat
     }
 
     /**
+     * Get conversations that users have in common
+     *  @param array | collection $users
+     *
+     * @return Conversations
+     */
+    public function commonConversations($users)
+    {
+        return $this->conversation->common($users);
+    }
+
+    /**
      * Get Private Conversation between two users.
      *
      * @param int | User $userOne

@@ -374,6 +374,32 @@ class ChatTest extends TestCase
         $this->assertCount(3, $recent_messages);
     }
 
+    /** @test */
+    public function it_can_return_a_common_conversation_among_users()
+    {
+        $users = $this->createUsers(4);
+
+        $conversation = Chat::createConversation([$users[0]->id, $users[1]->id]);
+        Chat::message('Hello 1')->from($users[1])->to($conversation)->send();
+        Chat::message('Hello 2')->from($users[0])->to($conversation)->send();
+
+        $conversation2 = Chat::createConversation([$users[0]->id, $users[2]->id]);
+        Chat::message('Hello Man 4')->from($users[0])->to($conversation2)->send();
+
+        $conversation3 = Chat::createConversation([$users[0]->id, $users[1]->id, $users[3]->id]);
+        Chat::message('Hello Man 5')->from($users[3])->to($conversation3)->send();
+        Chat::message('Hello Man 6')->from($users[0])->to($conversation3)->send();
+        Chat::message('Hello Man 3')->from($users[2])->to($conversation2)->send();
+
+        $users = \App\User::whereIn('id', [1,2,4])->get();
+
+        $conversations = Chat::commonConversations($users);
+
+        $this->assertCount(1, $conversations);
+
+        $this->assertEquals(3, $conversations->first()->id);
+    }
+
     public function createUsers($count = 1)
     {
         return factory('App\User', $count)->create();

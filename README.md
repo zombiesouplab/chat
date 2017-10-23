@@ -14,6 +14,7 @@
   - [Delete a message](#delete-a-message)
   - [Clear a conversation](#clear-a-conversation)
   - [Get a conversation between two users](#get-a-conversation-between-two-users)
+  - [Get common conversations among users](#get-common-conversations-among-users)
   - [Remove users from a conversation](#remove-users-from-a-conversation)
   - [Add users to a conversation](#add-users-to-a-conversation)
   - [Get messages in a conversation](#get-messages-in-a-conversation)
@@ -138,6 +139,15 @@ Chat::conversations($conversation)->for($user)->clear();
 ```php
 Chat::getConversationBetween($user1, $user2);
 ```
+
+#### Get common conversations among users
+
+```php
+$conversations = Chat::commonConversations($users);
+```
+$users can be an array of user ids ex. [1,4,6]
+
+OR a collection (\Illuminate\Database\Eloquent\Collection) of users
 
 #### Remove users from a conversation
 

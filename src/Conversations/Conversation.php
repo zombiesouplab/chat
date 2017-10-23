@@ -191,6 +191,27 @@ class Conversation extends Model
     }
 
     /**
+     * Gets conversations that are common for a list of users
+     * @param \Illuminate\Database\Eloquent\Collection | array $users ids
+     *
+     * @return \Illuminate\Database\Eloquent\Collection Conversation
+     */
+    public function common($users)
+    {
+        if ($users instanceof \Illuminate\Database\Eloquent\Collection) {
+            $users = $users->map(function($user) {
+                return $user->id;
+            });
+        }
+
+        return $this->withCount(['users' => function ($query) use($users){
+            $query->whereIn('id', $users);
+        }])->get()->filter(function ($conversation, $key) use($users) {
+            return $conversation->users_count == count($users);
+        });
+    }
+
+    /**
      * Gets the notifications.
      *
      * @param User $user The user
