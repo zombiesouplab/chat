@@ -191,7 +191,8 @@ class Conversation extends Model
     }
 
     /**
-     * Gets conversations that are common for a list of users
+     * Gets conversations that are common for a list of users.
+     *
      * @param \Illuminate\Database\Eloquent\Collection | array $users ids
      *
      * @return \Illuminate\Database\Eloquent\Collection Conversation
@@ -199,14 +200,14 @@ class Conversation extends Model
     public function common($users)
     {
         if ($users instanceof \Illuminate\Database\Eloquent\Collection) {
-            $users = $users->map(function($user) {
+            $users = $users->map(function ($user) {
                 return $user->id;
             });
         }
 
-        return $this->withCount(['users' => function ($query) use($users){
+        return $this->withCount(['users' => function ($query) use ($users) {
             $query->whereIn('id', $users);
-        }])->get()->filter(function ($conversation, $key) use($users) {
+        }])->get()->filter(function ($conversation, $key) use ($users) {
             return $conversation->users_count == count($users);
         });
     }

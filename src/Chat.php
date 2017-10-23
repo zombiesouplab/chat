@@ -323,7 +323,8 @@ class Chat
     }
 
     /**
-     * Get conversations that users have in common
+     * Get conversations that users have in common.
+     *
      *  @param array | collection $users
      *
      * @return Conversations
