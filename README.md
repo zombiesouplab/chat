@@ -8,6 +8,7 @@
 - [Usage](#usage)
   - [Creating a conversation](#creating-a-conversation)
   - [Get a conversation by Id](#get-a-conversation-by-id)
+  - [Update conversation details](#update-conversation-details)
   - [Send a text message](#send-a-text-message)
   - [Send a message of custom type](#send-a-message-of-custom-type)
   - [Mark a message as read](#mark-a-message-as-read)
@@ -88,6 +89,12 @@ $conversation = Chat::createConversation($participants);
 #### Get a conversation by id
 ```
 $conversation = Chat::conversation($conversation_id);
+```
+
+#### Update conversation details
+```
+$data = ['title' => 'PHP Channel', 'description' => 'PHP Channel Description'];
+$conversation->update(['data' => $data]);
 ```
 
 #### Send a text message
