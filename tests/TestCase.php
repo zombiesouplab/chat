@@ -18,6 +18,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $this->artisan('migrate', ['--database' => 'testbench']);
         $this->loadMigrationsFrom(__DIR__.'/../src/migrations');
         $this->withFactories(__DIR__.'/../src/database/factories');
+
+        $this->users = $this->createUsers(6);
     }
 
     public function tearDown()
