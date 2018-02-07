@@ -1,6 +1,6 @@
+[![Build Status](https://travis-ci.org/musonza/chat.svg?branch=master)](https://travis-ci.org/musonza/chat)
 [![Downloads](https://img.shields.io/packagist/dt/musonza/chat.svg)](https://packagist.org/packages/musonza/chat)
 [![Packagist](https://img.shields.io/packagist/v/musonza/chat.svg)](https://packagist.org/packages/musonza/chat)
-[![StyleCI](https://styleci.io/repos/54214978/shield?branch=master)](https://styleci.io/repos/54214978)
 ## Chat 
 
 - [Introduction](#introduction)
