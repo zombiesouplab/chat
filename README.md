@@ -28,9 +28,9 @@
 
 ## Introduction
 
-This package allows you to add a chat system to your Laravel ^5.3 application
+This package allows you to add a chat system to your Laravel ^5.4 application
 
-> **Note:** If you are using a Laravel version less than 5.3 [install the release on this branch instead](https://github.com/musonza/chat/tree/1.0).
+> **Note:** If you are using a Laravel version less than 5.4 [install the release on this branch instead](https://github.com/musonza/chat/tree/1.0).
 
 ## Installation
 
