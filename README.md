@@ -1,4 +1,4 @@
-<p align="center"><img src="menu.png" alt="chat" height="150px"></p>
+<p align="left"><img src="menu.png" alt="chat" width="160px"></p>
 
 [![Build Status](https://travis-ci.org/musonza/chat.svg?branch=master)](https://travis-ci.org/musonza/chat)
 [![Downloads](https://img.shields.io/packagist/dt/musonza/chat.svg)](https://packagist.org/packages/musonza/chat)
