@@ -2,10 +2,19 @@
 
 namespace Musonza\Chat\Tests;
 
+require __DIR__.'/../database/migrations/create_chat_tables.php';
+
+use CreateChatTables;
 use Musonza\Chat\User;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
+    protected $conversation;
+    protected $prefix = 'mc_';
+
     public function __construct()
     {
         parent::__construct();
@@ -16,15 +25,27 @@ class TestCase extends \Orchestra\Testbench\TestCase
         parent::setUp();
 
         $this->artisan('migrate', ['--database' => 'testbench']);
-        $this->loadMigrationsFrom(__DIR__.'/../src/migrations');
-        $this->withFactories(__DIR__.'/../src/database/factories');
-
+        $this->withFactories(__DIR__.'/../database/factories');
+        $this->migrate();
         $this->users = $this->createUsers(6);
     }
 
-    public function tearDown()
+    protected function migrateTestTables()
     {
-        parent::tearDown();
+        Schema::create('users', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+    }
+
+    protected function migrate()
+    {
+        (new CreateChatTables)->up();
+        $this->migrateTestTables();
     }
 
     /**
@@ -57,7 +78,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
         // ]);
 
         $app['config']->set('musonza_chat.user_model', 'Musonza\Chat\User');
-        $app['config']->set('musonza_chat.laravel_notifications', false);
         $app['config']->set('musonza_chat.broadcasts', false);
     }
 
@@ -79,5 +99,17 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function createUsers($count = 1)
     {
         return factory(User::class, $count)->create();
+    }
+
+    public function tearDown()
+    {
+        $this->rollbackTestTables();
+        (new CreateChatTables)->down();
+        parent::tearDown();
+    }
+
+    protected function rollbackTestTables()
+    {
+        Schema::drop('users');
     }
 }

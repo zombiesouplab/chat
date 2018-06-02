@@ -1,10 +1,11 @@
 <?php
 
-namespace Musonza\Chat\Messages;
+namespace Musonza\Chat\Eventing;
 
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Musonza\Chat\Notifications\MessageNotification;
+use Musonza\Chat\Models\Message;
+use Musonza\Chat\Models\MessageNotification;
 
 class MessageWasSent implements ShouldBroadcast
 {
@@ -33,6 +34,6 @@ class MessageWasSent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('mc-chat-conversation.'.$this->message->conversation->id);
+        return new PrivateChannel('mc-chat-conversation.' . $this->message->conversation->id);
     }
 }

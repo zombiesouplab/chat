@@ -1,19 +1,20 @@
 <?php
 
-namespace Musonza\Chat\Notifications;
+namespace Musonza\Chat\Models;
 
 use Eloquent;
-use Illuminate\Support\Facades\Notification;
 use Musonza\Chat\Chat;
-use Musonza\Chat\Conversations\Conversation;
-use Musonza\Chat\Messages\Message;
+use Musonza\Chat\Models\Message;
+use Illuminate\Support\Facades\Notification;
+use Musonza\Chat\Models\Conversation;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MessageNotification extends Eloquent
 {
+    use SoftDeletes;
+
     protected $fillable = ['user_id', 'message_id', 'conversation_id'];
-
     protected $table = 'mc_message_notification';
-
     protected $dates = ['deleted_at'];
 
     /**
@@ -24,11 +25,7 @@ class MessageNotification extends Eloquent
      */
     public static function make(Message $message, Conversation $conversation)
     {
-        if (Chat::laravelNotifications()) {
-            self::createLaravelNotifications($message, $conversation);
-        } else {
-            self::createCustomNotifications($message, $conversation);
-        }
+        self::createCustomNotifications($message, $conversation);
     }
 
     public function unReadNotifications($user)
@@ -57,26 +54,6 @@ class MessageNotification extends Eloquent
         }
 
         self::insert($notification);
-    }
-
-    public static function createLaravelNotifications($message, $conversation)
-    {
-        $recipients = $conversation->users->filter(function ($user) use ($message, $conversation) {
-            if ($message->user_id === $user->id) {
-                $user->notify(new MessageSent([
-                    'message_id'      => $message->id,
-                    'conversation_id' => $conversation->id,
-                    'outgoing'        => true,
-                ]));
-            }
-
-            return $message->user_id !== $user->id;
-        });
-
-        Notification::send($recipients, new MessageSent([
-            'message_id'      => $message->id,
-            'conversation_id' => $conversation->id,
-        ]));
     }
 
     public function markAsRead()

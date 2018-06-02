@@ -1,20 +1,20 @@
 <?php
 
-namespace Musonza\Chat\Messages;
+namespace Musonza\Chat\Models;
 
 use Eloquent;
-use Illuminate\Notifications\Notification;
 use Musonza\Chat\Chat;
-use Musonza\Chat\Conversations\Conversation;
 use Musonza\Chat\Eventing\EventGenerator;
-use Musonza\Chat\Notifications\MessageNotification;
+use Musonza\Chat\Eventing\MessageWasSent;
+use Musonza\Chat\Models\Conversation;
+use Musonza\Chat\Models\MessageNotification;
 
 class Message extends Eloquent
 {
+    use EventGenerator;
+
     protected $fillable = ['body', 'user_id', 'type'];
-
     protected $table = 'mc_messages';
-
     /**
      * All of the relationships to be touched.
      *
@@ -22,7 +22,14 @@ class Message extends Eloquent
      */
     protected $touches = ['conversation'];
 
-    use EventGenerator;
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'flagged' => 'boolean',
+    ];
 
     public function sender()
     {
@@ -31,15 +38,6 @@ class Message extends Eloquent
 
     public function unreadCount($user)
     {
-        if (Chat::laravelNotifications()) {
-            return \DB::table('notifications')
-                ->where('notifiable_id', $user->id)
-                ->where('type', 'Musonza\Chat\Notifications\MessageSent')
-                ->whereNull('read_at')
-                ->whereNull('notifications.data->outgoing')
-                ->count();
-        }
-
         return MessageNotification::where('user_id', $user->id)
             ->where('is_seen', 0)
             ->count();
@@ -47,7 +45,7 @@ class Message extends Eloquent
 
     public function conversation()
     {
-        return $this->belongsTo('Musonza\Chat\Conversations\Conversation', 'conversation_id');
+        return $this->belongsTo(Conversation::class, 'conversation_id');
     }
 
     /**
@@ -63,9 +61,9 @@ class Message extends Eloquent
     public function send(Conversation $conversation, $body, $userId, $type = 'text')
     {
         $message = $conversation->messages()->create([
-            'body'    => $body,
+            'body' => $body,
             'user_id' => $userId,
-            'type'    => $type,
+            'type' => $type,
         ]);
 
         $this->raise(new MessageWasSent($message));
@@ -83,12 +81,6 @@ class Message extends Eloquent
      */
     public function trash($user)
     {
-        if (Chat::laravelNotifications()) {
-            return $user->notifications()
-                ->where('data->message_id', $this->id)
-                ->delete();
-        }
-
         return MessageNotification::where('user_id', $user->id)
             ->where('message_id', $this->id)
             ->delete();
@@ -103,15 +95,6 @@ class Message extends Eloquent
      */
     public function getNotification($user)
     {
-        if (Chat::laravelNotifications()) {
-            return $user->notifications->filter(function ($item) use ($user) {
-                return $item->type == 'Musonza\Chat\Notifications\MessageSent' &&
-                    $item->data['message_id'] == $this->id &&
-                    $item->data['conversation_id'] == $this->conversation_id &&
-                    $item->notifiable_id == $user->id;
-            })->first();
-        }
-
         return MessageNotification::where('user_id', $user->id)
             ->where('message_id', $this->id)
             ->select(['mc_message_notification.*', 'mc_message_notification.updated_at as read_at'])
@@ -128,5 +111,22 @@ class Message extends Eloquent
     public function markRead($user)
     {
         $this->getNotification($user)->markAsRead();
+    }
+
+    public function flagged($user)
+    {
+        return !!MessageNotification::where('user_id', $user->id)
+            ->where('message_id', $this->id)
+            ->where('flagged', 1)
+            ->first();
+    }
+
+    public function toggleFlag($user)
+    {
+        MessageNotification::where('user_id', $user->id)
+            ->where('message_id', $this->id)
+            ->update(['flagged' => $this->flagged($user) ? false : true]);
+
+        return $this;
     }
 }
