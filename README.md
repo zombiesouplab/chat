@@ -5,6 +5,8 @@
 [![Packagist](https://img.shields.io/packagist/v/musonza/chat.svg)](https://packagist.org/packages/musonza/chat)
 ## Chat
 
+[Demo Application](https://github.com/musonza/chat-demo)
+
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
