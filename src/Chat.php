@@ -114,4 +114,9 @@ class Chat
     {
         return config('musonza_chat.sent_message_event');
     }
+
+    public static function makeThreeOrMoreUsersPublic()
+    {
+        return config('musonza_chat.make_three_or_more_users_public', true);
+    }
 }

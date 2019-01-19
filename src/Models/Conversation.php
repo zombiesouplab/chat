@@ -60,6 +60,7 @@ class Conversation extends BaseModel
     /**
      * Gets the list of conversations.
      *
+     * @deprecated This will be deprecated in 4.0
      * @param User   $user     The user
      * @param int    $perPage  The per page
      * @param int    $page     The page
@@ -70,6 +71,17 @@ class Conversation extends BaseModel
     public function getList($user, $perPage = 25, $page = 1, $pageName = 'page')
     {
         return $this->getConversationsList($user, $perPage, $page, $pageName);
+    }
+
+    public function getUserConversations($user, array $options)
+    {
+        return $this->getConversationsList(
+            $user,
+            $options['perPage'],
+            $options['page'],
+            $options['pageName'],
+            $options['isPrivate']
+        );
     }
 
     /**
@@ -89,7 +101,7 @@ class Conversation extends BaseModel
             $this->users()->attach($userIds);
         }
 
-        if ($this->users->count() > 2) {
+        if (Chat::makeThreeOrMoreUsersPublic() && $this->fresh()->users->count() > 2) {
             $this->private = false;
             $this->save();
         }
@@ -135,6 +147,20 @@ class Conversation extends BaseModel
         }
 
         return $conversation;
+    }
+
+    /**
+     * Sets conversation as public or private.
+     *
+     * @param boolean $isPrivate
+     * @return Conversation
+     */
+    public function makePrivate($isPrivate = true)
+    {
+        $this->private = $isPrivate;
+        $this->save();
+
+        return $this;
     }
 
     /**
@@ -257,9 +283,9 @@ class Conversation extends BaseModel
         return $messages;
     }
 
-    private function getConversationsList($user, $perPage, $page, $pageName)
+    private function getConversationsList($user, $perPage, $page, $pageName, $isPrivate = null)
     {
-        return $this->join('mc_conversation_user', 'mc_conversation_user.conversation_id', '=', 'mc_conversations.id')
+        $paginator = $this->join('mc_conversation_user', 'mc_conversation_user.conversation_id', '=', 'mc_conversations.id')
             ->with([
                 'last_message' => function ($query) use ($user) {
                     $query->join('mc_message_notification', 'mc_message_notification.message_id', '=', 'mc_messages.id')
@@ -267,8 +293,13 @@ class Conversation extends BaseModel
                         ->where('mc_message_notification.user_id', $user->id)
                         ->whereNull('mc_message_notification.deleted_at');
                 },
-            ])->where('mc_conversation_user.user_id', $user->id)
-            ->orderBy('mc_conversations.updated_at', 'DESC')
+            ])->where('mc_conversation_user.user_id', $user->id);
+
+        if (!is_null($isPrivate)) {
+            $paginator = $paginator->where('mc_conversations.private', $isPrivate);
+        }
+
+        return $paginator->orderBy('mc_conversations.updated_at', 'DESC')
             ->distinct('mc_conversations.id')
             ->paginate($perPage, ['mc_conversations.*'], $pageName, $page);
     }
