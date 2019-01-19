@@ -87,7 +87,7 @@ return [
      * See Musonza\Chat\Eventing\MessageWasSent if you want to customize.
      */
     'sent_message_event' => 'Musonza\Chat\Eventing\MessageWasSent',
-    
+
     /**
      * Automatically convert conversations with more than two users to public
      */
@@ -113,6 +113,17 @@ However, you can update the user model in `musonza_chat.php` published in the `c
 $participants = [$userId, $userId2,...];
 
 $conversation = Chat::createConversation($participants);
+```
+
+#### Creating a conversation of type private / public
+```php
+$participants = [$userId, $userId2,...];
+
+// Create a private conversation
+$conversation = Chat::createConversation($participants)->makePrivate();
+
+// Create a public conversation
+$conversation = Chat::createConversation($participants)->makePrivate(false);
 ```
 
 #### Get a conversation by id
@@ -235,13 +246,26 @@ Chat::conversation($conversation)->addParticipants($user);
 Chat::conversation($conversation)->addParticipants([$user3, $user4]);
 ```
 
-<b>Note:</b> A third user will classify the conversation as not private if it was.
+<b>Note:</b> By default, a third user will classify the conversation as not private if it was. See config on how to change this.
 
 
 #### Get messages in a conversation
 
 ```php
 Chat::conversation($conversation)->for($user)->getMessages()
+```
+
+#### Get user conversations by type
+
+```php
+// private conversations
+$conversations = Chat::conversations()->for($user)->isPrivate()->get();
+
+// public conversations
+$conversations = Chat::conversations()->for($user)->isPrivate(false)->get();
+
+// all conversations
+$conversations = Chat::conversations()->for($user)->get();
 ```
 
 #### Get recent messages
