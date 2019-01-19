@@ -209,4 +209,71 @@ class ConversationTest extends TestCase
 
         $this->assertFalse((bool) $conversations->get(0)->last_message->is_seen);
     }
+
+    /** @test */
+    public function it_allows_setting_private_or_public_conversation()
+    {
+        $conversation = Chat::createConversation([
+          $this->users[0]->id,
+          $this->users[1]->id
+        ])
+        ->makePrivate();
+
+        $this->assertTrue($conversation->private);
+
+        $conversation->makePrivate(false);
+
+        $this->assertFalse($conversation->private);
+    }
+
+    /** @test */
+    public function it_converts_at_least_3_participants_to_public_by_default()
+    {
+        $conversation = Chat::createConversation([
+          $this->users[0]->id,
+          $this->users[1]->id
+        ])
+        ->makePrivate();
+
+        $this->assertTrue($conversation->private);
+
+        $conversation = Chat::conversation($conversation)->addParticipants($this->createUsers(1));
+
+        $this->assertFalse($conversation->private);
+    }
+
+    /** @test */
+    public function converting_at_least_three_participants_to_public_is_configurable()
+    {
+        $this->app['config']->set('musonza_chat.make_three_or_more_users_public', false);
+
+        $conversation = Chat::createConversation([
+          $this->users[0]->id,
+          $this->users[1]->id
+        ])
+        ->makePrivate();
+
+        $this->assertTrue($conversation->private);
+
+        $conversation = Chat::conversation($conversation)->addParticipants($this->createUsers(1));
+
+        $this->assertTrue($conversation->private);
+    }
+
+    /** @test */
+    public function it_filters_conversations_by_type()
+    {
+        Chat::createConversation([$this->users[0]->id, $this->users[1]->id])->makePrivate();
+        Chat::createConversation([$this->users[0]->id, $this->users[1]->id])->makePrivate(false);
+        Chat::createConversation([$this->users[0]->id, $this->users[1]->id])->makePrivate();
+
+        $allConversations = Chat::conversations()->for($this->users[0])->get();
+        $this->assertCount(3, $allConversations);
+
+        $privateConversations = Chat::conversations()->for($this->users[0])->isPrivate()->get();
+        $this->assertCount(2, $privateConversations);
+
+        $publicConversations = Chat::conversations()->for($this->users[0])->isPrivate(false)->get();
+        $this->assertCount(1, $publicConversations);
+    }
 }
