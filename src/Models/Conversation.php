@@ -61,6 +61,7 @@ class Conversation extends BaseModel
      * Gets the list of conversations.
      *
      * @deprecated This will be deprecated in 4.0
+     * 
      * @param User   $user     The user
      * @param int    $perPage  The per page
      * @param int    $page     The page
@@ -152,7 +153,8 @@ class Conversation extends BaseModel
     /**
      * Sets conversation as public or private.
      *
-     * @param boolean $isPrivate
+     * @param bool $isPrivate
+     * 
      * @return Conversation
      */
     public function makePrivate($isPrivate = true)
@@ -300,6 +302,7 @@ class Conversation extends BaseModel
         }
 
         return $paginator->orderBy('mc_conversations.updated_at', 'DESC')
+            ->orderBy('mc_conversations.id', 'DESC')
             ->distinct('mc_conversations.id')
             ->paginate($perPage, ['mc_conversations.*'], $pageName, $page);
     }
