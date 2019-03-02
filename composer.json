@@ -44,7 +44,10 @@
         "laravel": {
             "providers": [
                 "Musonza\\Chat\\ChatServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "Chat": "Musonza\\Chat\\Facades\\ChatFacade::class"
+            }
         }
     }
 }
