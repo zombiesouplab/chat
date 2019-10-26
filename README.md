@@ -27,6 +27,7 @@ Create a Chat application for your Laravel Models
   - [Unread messages count](#unread-messages-count)
   - [Delete a message](#delete-a-message)
   - [Clear a conversation](#clear-a-conversation)
+  - [Get participant conversations](#Get-participant-conversations)
   - [Get a conversation between two participants](#get-a-conversation-between-two-participants)
   - [Get common conversations among participants](#get-common-conversations-among-participants)
   - [Remove participants from a conversation](#remove-participants-from-a-conversation)
@@ -239,6 +240,12 @@ Chat::message($message)->setParticipant($participantModel)->delete();
 
 ```php
 Chat::conversation($conversation)->setParticipant($participantModel)->clear();
+```
+
+#### Get participant conversations
+
+```php
+$participantModel->conversations();
 ```
 
 #### Get a conversation between two participants

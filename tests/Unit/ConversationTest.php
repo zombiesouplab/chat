@@ -30,6 +30,15 @@ class ConversationTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_participant_conversations()
+    {
+        Chat::createConversation([$this->users[0], $this->users[1]]);
+        Chat::createConversation([$this->users[0], $this->users[2]]);
+
+        $this->assertEquals(2, $this->users[0]->conversations()->count());
+    }
+
+    /** @test */
     public function it_can_mark_a_conversation_as_read()
     {
         $conversation = Chat::createConversation([$this->users[0], $this->users[1]]);
