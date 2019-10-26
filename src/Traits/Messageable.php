@@ -2,6 +2,7 @@
 
 namespace Musonza\Chat\Traits;
 
+use Musonza\Chat\Models\Conversation;
 use Musonza\Chat\Models\ConversationParticipant;
 
 trait Messageable
@@ -12,6 +13,11 @@ trait Messageable
     }
 
     public function conversations()
+    {
+        return $this->participation->pluck('conversation');
+    }
+
+    public function participation()
     {
         return $this->morphMany(ConversationParticipant::class, 'messageable');
     }
@@ -24,12 +30,12 @@ trait Messageable
             'conversation_id'  => $conversationId,
         ]);
 
-        $this->conversations()->save($participation);
+        $this->participation()->save($participation);
     }
 
     public function leaveConversation($conversationId)
     {
-        $this->conversations()->where([
+        $this->participation()->where([
             'messageable_id'   => $this->getKey(),
             'messageable_type' => get_class($this),
             'conversation_id'  => $conversationId,

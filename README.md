@@ -124,7 +124,8 @@ You can get the details as follows:
 $participantModel->getParticipantDetails();
 ```
 Assuming you have a column `name` for your model, this returns a default array `['name' => 'column_value']`
-You can however, customize this for your needs by adding an Eloquent Accessor to your model as follows:
+You can however, customize this for your needs by adding an Eloquent Accessor that returns an array
+ with as much as you need to your model as follows:
 
 ```php
     public function getParticipantDetailsAttribute()

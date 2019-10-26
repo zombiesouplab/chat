@@ -4,6 +4,7 @@ namespace Musonza\Chat\Tests;
 
 use Chat;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Musonza\Chat\Models\Conversation;
 use Musonza\Chat\Tests\Helpers\Models\Client;
 
 class ConversationTest extends TestCase
@@ -13,7 +14,7 @@ class ConversationTest extends TestCase
     /** @test */
     public function it_creates_a_conversation()
     {
-        $conversation = Chat::createConversation([$this->users[0], $this->users[1]]);
+        Chat::createConversation([$this->users[0], $this->users[1]]);
 
         $this->assertDatabaseHas($this->prefix.'conversations', ['id' => 1]);
     }
