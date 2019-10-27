@@ -45,3 +45,4 @@ ehthumbs.db
 Thumbs.db
 composer.lock
 .phpunit.result.cache
+phpunit.xml
