@@ -11,6 +11,8 @@ use Illuminate\Support\Collection;
 use Musonza\Chat\BaseModel;
 use Musonza\Chat\Chat;
 use Musonza\Chat\ConfigurationManager;
+use Musonza\Chat\Exceptions\DirectMessagingExistsException;
+use Musonza\Chat\Exceptions\InvalidDirectMessageNumberOfParticipants;
 
 class Conversation extends BaseModel
 {
@@ -92,11 +94,12 @@ class Conversation extends BaseModel
      * @param $participants
      *
      * @return Conversation
+     * @throws InvalidDirectMessageNumberOfParticipants
      */
     public function addParticipants($participants): self
     {
         foreach ($participants as $participant) {
-            $participant->joinConversation($this->getKey());
+            $participant->joinConversation($this);
         }
 
         return $this;
@@ -165,13 +168,35 @@ class Conversation extends BaseModel
      * @param bool $isDirect
      *
      * @return Conversation
+     * @throws InvalidDirectMessageNumberOfParticipants
+     * @throws DirectMessagingExistsException
      */
     public function makeDirect($isDirect = true)
     {
+        if ($this->participants()->count() > 2) {
+            throw new InvalidDirectMessageNumberOfParticipants();
+        }
+
+        $this->ensureNoDirectMessaging();
+
         $this->direct_message = $isDirect;
         $this->save();
 
         return $this;
+    }
+
+    private function ensureNoDirectMessaging()
+    {
+        $participants = $this->participants()->get()->pluck('messageable');
+
+        $modelOne = $participants[0];
+        $modelTwo = $participants[1];
+
+        $common = \Chat::conversations()->between($modelOne, $modelTwo);
+
+        if (!is_null($common)) {
+            throw new DirectMessagingExistsException();
+        }
     }
 
     /**
@@ -331,5 +356,10 @@ class Conversation extends BaseModel
             ->where('mc_message_notification.messageable_type', get_class($participant))
             ->where('conversation_id', $this->getKey())
             ->delete();
+    }
+
+    public function isDirectMessage()
+    {
+        return !!$this->direct_message;
     }
 }

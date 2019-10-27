@@ -3,7 +3,11 @@
 namespace Musonza\Chat\Tests;
 
 use Chat;
+use Exception;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Musonza\Chat\Exceptions\DirectMessagingExistsException;
+use Musonza\Chat\Exceptions\InvalidDirectMessageNumberOfParticipants;
+use Musonza\Chat\Models\Conversation;
 use Musonza\Chat\Tests\Helpers\Models\Client;
 
 class ConversationTest extends TestCase
@@ -40,7 +44,10 @@ class ConversationTest extends TestCase
     /** @test */
     public function it_can_mark_a_conversation_as_read()
     {
-        $conversation = Chat::createConversation([$this->users[0], $this->users[1]]);
+        $conversation = Chat::createConversation([
+            $this->users[0],
+            $this->users[1],
+        ])->makeDirect();
 
         Chat::message('Hello there 0')->from($this->users[1])->to($conversation)->send();
         Chat::message('Hello there 0')->from($this->users[1])->to($conversation)->send();
@@ -233,6 +240,29 @@ class ConversationTest extends TestCase
             ->makeDirect();
 
         $this->assertTrue($conversation->direct_message);
+    }
+
+    /** @test */
+    public function it_does_not_duplicate_direct_messaging()
+    {
+        Chat::createConversation([$this->users[0], $this->users[1],])
+            ->makeDirect();
+
+        $this->expectException(DirectMessagingExistsException::class);
+
+        Chat::createConversation([$this->users[0], $this->users[1]])
+            ->makeDirect();
+    }
+
+    /** @test */
+    public function it_prevents_additional_participants_to_direct_conversation()
+    {
+        /** @var Conversation $conversation */
+        $conversation = Chat::createConversation([$this->users[0], $this->users[1],])
+            ->makeDirect();
+
+        $this->expectException(InvalidDirectMessageNumberOfParticipants::class);
+        $conversation->addParticipants([$this->users[2]]);
     }
 
     /** @test */
