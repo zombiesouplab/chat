@@ -168,12 +168,6 @@ class MessageTest extends TestCase
 
         Chat::message('Hello Man')->from($this->users[1])->to($conversation)->send();
 
-//        $messages  = Chat::conversation($conversation)->setParticipant($this->users[0])->perPage(3)->page(3)->getMessages();
-//
-//        dd($messages->toArray());
-//
-//        dd(Participation::first()->messageable);
-
         $this->assertEquals($conversation->messages->count(), 7);
         $this->assertEquals(3, Chat::conversation($conversation)->setParticipant($this->users[0])->perPage(3)->getMessages()->count());
         $this->assertEquals(3, Chat::conversation($conversation)->setParticipant($this->users[0])->perPage(3)->page(2)->getMessages()->count());

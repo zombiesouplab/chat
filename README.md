@@ -22,6 +22,7 @@ Create a Chat application for your Laravel Models
   - [Send a text message](#send-a-text-message)
   - [Send a message of custom type](#send-a-message-of-custom-type)
   - [Get a message by id](#get-a-message-by-id)
+  - [Get message sender](#Get-message-sender)
   - [Mark a message as read](#mark-a-message-as-read)
   - [Mark whole conversation as read](#mark-whole-conversation-as-read)
   - [Unread messages count](#unread-messages-count)
@@ -196,6 +197,12 @@ $message = Chat::message('http://example.com/img')
 
 ```php
 $message = Chat::messages()->getById($id);
+```
+
+### Get message sender
+
+```php
+$sendModel = $message->sender;
 ```
 
 #### Mark a message as read

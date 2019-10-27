@@ -34,6 +34,8 @@ class Message extends BaseModel
         'flagged' => 'boolean',
     ];
 
+    protected $appends = ['sender'];
+
     public function participation()
     {
         return $this->belongsTo(Participation::class, 'participation_id');
@@ -76,7 +78,6 @@ class Message extends BaseModel
         ]);
 
         $messageWasSent = Chat::sentMessageEvent();
-//        $message->load('sender');
         $this->raise(new $messageWasSent($message));
 
         return $message;
