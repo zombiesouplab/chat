@@ -8,32 +8,18 @@ trait SetsParticipants
 {
     protected $sender;
     protected $recipient;
-    protected $user;
+    protected $participant;
 
     /**
-     * Sets user.
+     * Sets participant.
      *
-     * @param Model $user
+     * @param Model $participant
      *
      * @return $this
      */
-    public function for(Model $user): self
+    public function setParticipant(Model $participant): self
     {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * Sets user.
-     *
-     * @param Model $user
-     *
-     * @return $this
-     */
-    public function setParticipant(Model $user): self
-    {
-        $this->user = $user;
+        $this->participant = $participant;
 
         return $this;
     }

@@ -66,7 +66,7 @@ class MessageService
      */
     public function markRead()
     {
-        $this->message->markRead($this->user);
+        $this->message->markRead($this->participant);
     }
 
     /**
@@ -76,7 +76,7 @@ class MessageService
      */
     public function delete()
     {
-        $this->message->trash($this->user);
+        $this->message->trash($this->participant);
     }
 
     /**
@@ -86,17 +86,17 @@ class MessageService
      */
     public function unreadCount()
     {
-        return $this->message->unreadCount($this->user);
+        return $this->message->unreadCount($this->participant);
     }
 
     public function toggleFlag()
     {
-        return $this->message->toggleFlag($this->user);
+        return $this->message->toggleFlag($this->participant);
     }
 
     public function flagged()
     {
-        return $this->message->flagged($this->user);
+        return $this->message->flagged($this->participant);
     }
 
     /**

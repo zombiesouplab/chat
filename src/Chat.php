@@ -103,7 +103,7 @@ class Chat
      */
     public function unReadNotifications()
     {
-        return $this->messageNotification->unReadNotifications($this->user);
+        return $this->messageNotification->unReadNotifications($this->participant);
     }
 
     /**

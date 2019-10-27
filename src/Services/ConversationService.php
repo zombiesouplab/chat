@@ -5,6 +5,7 @@ namespace Musonza\Chat\Services;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Musonza\Chat\Eventing\ConversationStarted;
 use Musonza\Chat\Exceptions\InvalidDirectMessageNumberOfParticipants;
 use Musonza\Chat\Models\Conversation;
 use Musonza\Chat\Models\Message;
@@ -29,7 +30,11 @@ class ConversationService
 
     public function start($participants, $data = [])
     {
-        return $this->conversation->start($participants, $data);
+        $conversation = $this->conversation->start($participants, $data);
+
+        event(new ConversationStarted($conversation));
+
+        return $conversation;
     }
 
     public function setConversation($conversation)
@@ -46,12 +51,10 @@ class ConversationService
 
     /**
      * Get messages in a conversation.
-     *
-     * @return Message
      */
     public function getMessages()
     {
-        return $this->conversation->getMessages($this->user, $this->getPaginationParams(), $this->deleted);
+        return $this->conversation->getMessages($this->participant, $this->getPaginationParams(), $this->deleted);
     }
 
     /**
@@ -59,7 +62,7 @@ class ConversationService
      */
     public function clear()
     {
-        $this->conversation->clear($this->user);
+        $this->conversation->clear($this->participant);
     }
 
     /**
@@ -69,7 +72,7 @@ class ConversationService
      */
     public function readAll()
     {
-        $this->conversation->readAll($this->user);
+        $this->conversation->readAll($this->participant);
     }
 
     /**
@@ -102,7 +105,7 @@ class ConversationService
      */
     public function get()
     {
-        return $this->conversation->getParticipantConversations($this->user, [
+        return $this->conversation->getParticipantConversations($this->participant, [
           'perPage'   => $this->perPage,
           'page'      => $this->page,
           'pageName'  => 'page',
@@ -113,14 +116,12 @@ class ConversationService
     /**
      * Add user(s) to a conversation.
      *
-     * @param int | array $userId / array of user ids or an integer
-     *
+     * @param array $participants
      * @return Conversation
-     * @throws InvalidDirectMessageNumberOfParticipants
      */
-    public function addParticipants($userId)
+    public function addParticipants(array $participants)
     {
-        return $this->conversation->addParticipants($userId);
+        return $this->conversation->addParticipants($participants);
     }
 
     /**
@@ -142,7 +143,7 @@ class ConversationService
      */
     public function unreadCount()
     {
-        return $this->conversation->unReadNotifications($this->user)->count();
+        return $this->conversation->unReadNotifications($this->participant)->count();
     }
 
     /**
@@ -184,5 +185,13 @@ class ConversationService
         $this->filters['direct_message'] = $isDirectMessage;
 
         return $this;
+    }
+
+    public function updateSettings(array $settings)
+    {
+        $this->participant
+            ->participation()
+            ->where('conversation_id', $this->conversation->getKey())
+            ->update(['settings' => $settings]);
     }
 }

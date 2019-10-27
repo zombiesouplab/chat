@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Musonza\Chat\Models\Message;
 use Musonza\Chat\Models\MessageNotification;
 
-class MessageWasSent implements ShouldBroadcast
+class MessageWasSent extends Event implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -35,10 +35,10 @@ class MessageWasSent implements ShouldBroadcast
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array
+     * @return Channel
      */
     public function broadcastOn()
     {
-        return new Channel('mc-chat-conversation.'.$this->message->conversation->id);
+        return new Channel('mc-chat-conversation.' . $this->message->conversation->id);
     }
 }

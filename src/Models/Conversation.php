@@ -10,6 +10,8 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Musonza\Chat\BaseModel;
 use Musonza\Chat\ConfigurationManager;
+use Musonza\Chat\Eventing\ParticipantsJoined;
+use Musonza\Chat\Eventing\ParticipantsLeft;
 use Musonza\Chat\Exceptions\DirectMessagingExistsException;
 use Musonza\Chat\Exceptions\InvalidDirectMessageNumberOfParticipants;
 
@@ -92,15 +94,15 @@ class Conversation extends BaseModel
      *
      * @param $participants
      *
-     * @throws InvalidDirectMessageNumberOfParticipants
-     *
      * @return Conversation
      */
-    public function addParticipants($participants): self
+    public function addParticipants(array $participants): self
     {
         foreach ($participants as $participant) {
             $participant->joinConversation($this);
         }
+
+        event(new ParticipantsJoined($this,  $participants));
 
         return $this;
     }
@@ -119,10 +121,14 @@ class Conversation extends BaseModel
                 $participant->leaveConversation($this->getKey());
             }
 
+            event(new ParticipantsLeft($this,  $participants));
+
             return $this;
         }
 
         $participants->leaveConversation($this->getKey());
+
+        event(new ParticipantsLeft($this,  [$participants]));
 
         return $this;
     }

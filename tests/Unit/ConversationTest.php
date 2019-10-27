@@ -4,6 +4,7 @@ namespace Musonza\Chat\Tests;
 
 use Chat;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Musonza\Chat\ConfigurationManager;
 use Musonza\Chat\Exceptions\DirectMessagingExistsException;
 use Musonza\Chat\Exceptions\InvalidDirectMessageNumberOfParticipants;
 use Musonza\Chat\Models\Conversation;
@@ -137,7 +138,7 @@ class ConversationTest extends TestCase
 
         $otherUsers = $this->createUsers(5);
 
-        Chat::conversation($conversation)->addParticipants($otherUsers);
+        Chat::conversation($conversation)->addParticipants($otherUsers->all());
 
         $this->assertEquals($conversation->fresh()->participants->count(), 7);
     }
@@ -298,5 +299,31 @@ class ConversationTest extends TestCase
 
         $directConversations = Chat::conversations()->setParticipant($this->users[0])->isDirect()->get();
         $this->assertCount(1, $directConversations, 'Direct Conversations');
+    }
+
+    /**
+     * Conversation Settings
+     *
+     * @test
+     */
+    public function it_can_update_participant_conversation_settings()
+    {
+        /** @var Conversation $conversation */
+        $conversation = Chat::createConversation([$this->users[0], $this->users[1]]);
+
+        $settings = ['mute_mentions' => true];
+
+        Chat::conversation($conversation)
+            ->setParticipant($this->users[0])
+            ->updateSettings($settings);
+
+        $this->assertDatabaseHas(
+            ConfigurationManager::PARTICIPATION_TABLE,
+            [
+                'messageable_type' => get_class($this->users[0]),
+                'messageable_id' => $this->users[0]->getKey(),
+                'settings' => json_encode($settings),
+            ]
+        );
     }
 }
