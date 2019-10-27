@@ -117,6 +117,7 @@ class ConversationService
      * Add user(s) to a conversation.
      *
      * @param array $participants
+     *
      * @return Conversation
      */
     public function addParticipants(array $participants)
