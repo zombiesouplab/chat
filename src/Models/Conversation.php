@@ -99,11 +99,6 @@ class Conversation extends BaseModel
             $participant->joinConversation($this->getKey());
         }
 
-        if (Chat::makeThreeOrMoreParticipantsPublic() && $this->fresh()->participants->count() > 2) {
-            $this->private = false;
-            $this->save();
-        }
-
         return $this;
     }
 

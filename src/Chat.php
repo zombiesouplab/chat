@@ -120,9 +120,4 @@ class Chat
     {
         return config('musonza_chat.sent_message_event');
     }
-
-    public static function makeThreeOrMoreParticipantsPublic()
-    {
-        return config('musonza_chat.make_three_or_more_participants_public', true);
-    }
 }

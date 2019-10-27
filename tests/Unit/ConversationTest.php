@@ -250,40 +250,6 @@ class ConversationTest extends TestCase
     }
 
     /** @test */
-    public function it_converts_at_least_3_participants_to_public_by_default()
-    {
-        $conversation = Chat::createConversation([
-            $this->users[0],
-            $this->users[1],
-        ])
-            ->makePrivate();
-
-        $this->assertTrue($conversation->private);
-
-        $conversation = Chat::conversation($conversation)->addParticipants($this->createUsers(1));
-
-        $this->assertFalse($conversation->private);
-    }
-
-    /** @test */
-    public function converting_at_least_three_participants_to_public_is_configurable()
-    {
-        $this->app['config']->set('musonza_chat.make_three_or_more_participants_public', false);
-
-        $conversation = Chat::createConversation([
-            $this->users[0],
-            $this->users[1],
-        ])
-            ->makePrivate();
-
-        $this->assertTrue($conversation->private);
-
-        $conversation = Chat::conversation($conversation)->addParticipants($this->createUsers(1));
-
-        $this->assertTrue($conversation->private);
-    }
-
-    /** @test */
     public function it_filters_conversations_by_type()
     {
         Chat::createConversation([$this->users[0], $this->users[1]])->makePrivate();
