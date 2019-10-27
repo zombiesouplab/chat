@@ -16,6 +16,7 @@ class CreateChatTables extends Migration
         Schema::create('mc_conversations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->boolean('private')->default(true);
+            $table->boolean('direct_message')->default(false);
             $table->text('data')->nullable();
             $table->timestamps();
         });

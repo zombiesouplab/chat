@@ -73,7 +73,7 @@ class Conversation extends BaseModel
             $options['perPage'],
             $options['page'],
             $options['pageName'],
-            $options['isPrivate']
+            $options['filters']
         );
     }
 
@@ -165,15 +165,33 @@ class Conversation extends BaseModel
     }
 
     /**
+     * Sets conversation as direct message.
+     *
+     * @param bool $isDirect
+     *
+     * @return Conversation
+     */
+    public function makeDirect($isDirect = true)
+    {
+        $this->direct_message = $isDirect;
+        $this->save();
+
+        return $this;
+    }
+
+    /**
      * Gets conversations for a specific participant.
      *
      * @param Model $participant
      *
+     * @param bool $isDirectMessage
      * @return Collection
      */
-    public function participantConversations(Model $participant): Collection
+    public function participantConversations(Model $participant, bool $isDirectMessage = false): Collection
     {
-        return $participant->participation->pluck('conversation');
+        $conversations = $participant->participation->pluck('conversation');
+
+        return $isDirectMessage ? $conversations->where('direct_message', 1) : $conversations;
     }
 
     /**
@@ -270,11 +288,11 @@ class Conversation extends BaseModel
      * @param $perPage
      * @param $page
      * @param $pageName
-     * @param null $isPrivate
+     * @param $filters
      *
      * @return mixed
      */
-    private function getConversationsList(Model $participant, $perPage, $page, $pageName, $isPrivate = null)
+    private function getConversationsList(Model $participant, $perPage, $page, $pageName, $filters = [])
     {
         $paginator = $this->join('mc_participation', 'mc_participation.conversation_id', '=', 'mc_conversations.id')
             ->with([
@@ -289,8 +307,8 @@ class Conversation extends BaseModel
             ->where('mc_participation.messageable_id', $participant->getKey())
             ->where('mc_participation.messageable_type', get_class($participant));
 
-        if (!is_null($isPrivate)) {
-            $paginator = $paginator->where('mc_conversations.private', $isPrivate);
+        if (isset($filters['private'])) {
+            $paginator = $paginator->where('mc_conversations.private', !!$filters['private']);
         }
 
         return $paginator->orderBy('mc_conversations.updated_at', 'DESC')

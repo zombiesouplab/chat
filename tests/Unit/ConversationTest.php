@@ -86,22 +86,6 @@ class ConversationTest extends TestCase
     }
 
     /** @test */
-    public function it_can_return_a_conversation_between_users()
-    {
-        $conversation = Chat::createConversation([$this->users[0], $this->users[1]]);
-        $conversation2 = Chat::createConversation([$this->users[0], $this->users[2]]);
-        $conversation3 = Chat::createConversation([$this->users[0], $this->users[3]]);
-
-        $c1 = Chat::conversations()->between($this->users[0], $this->users[1]);
-
-        $this->assertEquals($conversation->id, $c1->id);
-
-        $c3 = Chat::conversations()->between($this->users[0], $this->users[3]);
-
-        $this->assertEquals($conversation3->id, $c3->id);
-    }
-
-    /** @test */
     public function it_can_remove_a_single_participant_from_conversation()
     {
         $clientModel = factory(Client::class)->create();
@@ -237,6 +221,32 @@ class ConversationTest extends TestCase
         $conversation->makePrivate(false);
 
         $this->assertFalse($conversation->private);
+    }
+
+    /**
+     * DIRECT MESSAGING
+     * @test
+     */
+    public function it_creates_direct_messaging()
+    {
+        $conversation = Chat::createConversation([$this->users[0], $this->users[1],])
+            ->makeDirect();
+
+        $this->assertTrue($conversation->direct_message);
+    }
+
+    /** @test */
+    public function it_can_return_a_conversation_between_users()
+    {
+        $conversation = Chat::createConversation([$this->users[0], $this->users[1]])->makeDirect();
+        $conversation2 = Chat::createConversation([$this->users[0], $this->users[2]]);
+        $conversation3 = Chat::createConversation([$this->users[0], $this->users[3]])->makeDirect();
+
+        $c1 = Chat::conversations()->between($this->users[0], $this->users[1]);
+        $this->assertEquals($conversation->id, $c1->id);
+
+        $c3 = Chat::conversations()->between($this->users[0], $this->users[3]);
+        $this->assertEquals($conversation3->id, $c3->id);
     }
 
     /** @test */

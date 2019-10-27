@@ -159,6 +159,12 @@ $conversation = Chat::createConversation($participants)->makePrivate();
 
 // Create a public conversation
 $conversation = Chat::createConversation($participants)->makePrivate(false);
+
+// Create a direct message
+$conversation = Chat::createConversation($participants)->makeDirect();
+
+Note: You will not be able to add additional participants to a direct conversation. 
+Additonally you can't remove a participant from a direct conversation.
 ```
 
 #### Get a conversation by id

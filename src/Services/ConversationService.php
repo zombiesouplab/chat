@@ -14,7 +14,7 @@ class ConversationService
 {
     use SetsParticipants, Paginates;
 
-    protected $isPrivate = null;
+    protected $filters = [];
 
     /**
      * @var Conversation
@@ -82,11 +82,11 @@ class ConversationService
     public function between(Model $participantOne, Model $participantTwo)
     {
         $participantOneConversationIds = $this->conversation
-            ->participantConversations($participantOne)
+            ->participantConversations($participantOne, true)
             ->pluck('id');
 
         $participantTwoConversationIds = $this->conversation
-            ->participantConversations($participantTwo)
+            ->participantConversations($participantTwo, true)
             ->pluck('id');
 
         $common = $this->getConversationsInCommon($participantOneConversationIds, $participantTwoConversationIds);
@@ -105,7 +105,7 @@ class ConversationService
           'perPage'   => $this->perPage,
           'page'      => $this->page,
           'pageName'  => 'page',
-          'isPrivate' => $this->isPrivate,
+          'filters' => $this->filters,
         ]);
     }
 
@@ -165,7 +165,7 @@ class ConversationService
      */
     public function isPrivate($isPrivate = true)
     {
-        $this->isPrivate = $isPrivate;
+        $this->filters['private'] = $isPrivate;
 
         return $this;
     }
