@@ -26,7 +26,7 @@ class Conversation extends BaseModel
      */
     public function participants()
     {
-        return $this->hasMany(ConversationParticipant::class);
+        return $this->hasMany(Participation::class);
     }
 
     /**
@@ -36,7 +36,9 @@ class Conversation extends BaseModel
      */
     public function last_message()
     {
-        return $this->hasOne(Message::class)->orderBy('mc_messages.id', 'desc')->with('sender');
+        return $this->hasOne(Message::class)
+            ->orderBy('mc_messages.id', 'desc')
+            ->with('participation');
     }
 
     /**
@@ -46,7 +48,7 @@ class Conversation extends BaseModel
      */
     public function messages()
     {
-        return $this->hasMany(Message::class, 'conversation_id')->with('sender');
+        return $this->hasMany(Message::class, 'conversation_id'); //->with('sender');
     }
 
     /**
@@ -170,9 +172,9 @@ class Conversation extends BaseModel
      */
     public function participantConversations(Model $participant): Collection
     {
-        return $this->join('mc_conversation_participant', 'mc_conversation_participant.conversation_id', '=', 'mc_conversations.id')
-            ->where('mc_conversation_participant.messageable_id', $participant->getKey())
-            ->where('mc_conversation_participant.messageable_type', get_class($participant))
+        return $this->join('mc_participation', 'mc_participation.conversation_id', '=', 'mc_conversations.id')
+            ->where('mc_participation.messageable_id', $participant->getKey())
+            ->where('mc_participation.messageable_type', get_class($participant))
             ->where('private', true)
             ->pluck('mc_conversations.id');
     }
@@ -277,7 +279,7 @@ class Conversation extends BaseModel
      */
     private function getConversationsList(Model $participant, $perPage, $page, $pageName, $isPrivate = null)
     {
-        $paginator = $this->join('mc_conversation_participant', 'mc_conversation_participant.conversation_id', '=', 'mc_conversations.id')
+        $paginator = $this->join('mc_participation', 'mc_participation.conversation_id', '=', 'mc_conversations.id')
             ->with([
                 'last_message' => function ($query) use ($participant) {
                     $query->join('mc_message_notification', 'mc_message_notification.message_id', '=', 'mc_messages.id')
@@ -287,8 +289,8 @@ class Conversation extends BaseModel
                         ->whereNull('mc_message_notification.deleted_at');
                 },
             ])
-            ->where('mc_conversation_participant.messageable_id', $participant->getKey())
-            ->where('mc_conversation_participant.messageable_type', get_class($participant));
+            ->where('mc_participation.messageable_id', $participant->getKey())
+            ->where('mc_participation.messageable_type', get_class($participant));
 
         if (!is_null($isPrivate)) {
             $paginator = $paginator->where('mc_conversations.private', $isPrivate);

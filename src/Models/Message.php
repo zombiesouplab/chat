@@ -34,9 +34,14 @@ class Message extends BaseModel
         'flagged' => 'boolean',
     ];
 
-    public function sender()
+    public function participation()
     {
-        return $this->belongsTo(ConversationParticipant::class, 'participation_id');
+        return $this->belongsTo(Participation::class, 'participation_id');
+    }
+
+    public function getSenderAttribute()
+    {
+        return $this->participation->messageable;
     }
 
     public function unreadCount(Model $participant)
@@ -57,12 +62,12 @@ class Message extends BaseModel
      *
      * @param Conversation            $conversation
      * @param string                  $body
-     * @param ConversationParticipant $participant
+     * @param Participation $participant
      * @param string                  $type
      *
      * @return Model
      */
-    public function send(Conversation $conversation, string $body, ConversationParticipant $participant, string $type = 'text'): Model
+    public function send(Conversation $conversation, string $body, Participation $participant, string $type = 'text'): Model
     {
         $message = $conversation->messages()->create([
             'body'             => $body,
@@ -71,7 +76,7 @@ class Message extends BaseModel
         ]);
 
         $messageWasSent = Chat::sentMessageEvent();
-        $message->load('sender');
+//        $message->load('sender');
         $this->raise(new $messageWasSent($message));
 
         return $message;

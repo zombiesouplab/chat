@@ -30,7 +30,7 @@ class CreateChatTables extends Migration
 
             $table->foreign('participation_id')
                 ->references('id')
-                ->on('mc_conversation_user')
+                ->on('mc_participation')
                 ->onDelete('set null');
 
             $table->foreign('conversation_id')
@@ -39,7 +39,7 @@ class CreateChatTables extends Migration
                 ->onDelete('cascade');
         });
 
-        Schema::create('mc_conversation_participant', function (Blueprint $table) {
+        Schema::create('mc_participation', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('conversation_id')->unsigned();
             $table->bigInteger('messageable_id')->unsigned();
@@ -79,7 +79,7 @@ class CreateChatTables extends Migration
 
             $table->foreign('participation_id')
                 ->references('id')
-                ->on('mc_conversation_participant')
+                ->on('mc_participation')
                 ->onDelete('cascade');
         });
     }

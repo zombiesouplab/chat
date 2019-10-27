@@ -5,6 +5,7 @@ namespace Musonza\Chat\Tests;
 use Chat;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Musonza\Chat\Models\Conversation;
+use Musonza\Chat\Models\Participation;
 use Musonza\Chat\Models\Message;
 use Musonza\Chat\Tests\Helpers\Models\Bot;
 use Musonza\Chat\Tests\Helpers\Models\Client;
@@ -112,7 +113,6 @@ class MessageTest extends TestCase
         $conversation = Chat::createConversation([$this->users[0], $this->users[1]]);
         $message = Chat::message('Hello there 0')->from($this->users[0])->to($conversation)->send();
 
-        $messageId = 1;
         $perPage = 5;
         $page = 1;
 
@@ -135,9 +135,25 @@ class MessageTest extends TestCase
         Chat::message('Hello')->from($this->users[0])->to($conversation)->send();
 
         $this->assertEquals(
-            $conversation->messages[0]->sender->getKey(),
+            $conversation->messages[0]->participation->getKey(),
             $conversation->messages[0]->participation_id
         );
+    }
+
+    /** @test */
+    public function it_can_tell_message_sender()
+    {
+        $bot = factory(Bot::class)->create();
+        $client = factory(Client::class)->create();
+
+        $conversation = Chat::createConversation([$this->users[0], $client, $bot]);
+        Chat::message('Hello')->from($this->users[0])->to($conversation)->send();
+        Chat::message('Hello')->from($bot)->to($conversation)->send();
+        Chat::message('Hello')->from($client)->to($conversation)->send();
+
+        $this->assertInstanceOf(User::class, $conversation->messages[0]->sender);
+        $this->assertInstanceOf(Bot::class, $conversation->messages[1]->sender);
+        $this->assertInstanceOf(Client::class, $conversation->messages[2]->sender);
     }
 
     /** @test */
@@ -151,6 +167,12 @@ class MessageTest extends TestCase
         }
 
         Chat::message('Hello Man')->from($this->users[1])->to($conversation)->send();
+
+//        $messages  = Chat::conversation($conversation)->setParticipant($this->users[0])->perPage(3)->page(3)->getMessages();
+//
+//        dd($messages->toArray());
+//
+//        dd(Participation::first()->messageable);
 
         $this->assertEquals($conversation->messages->count(), 7);
         $this->assertEquals(3, Chat::conversation($conversation)->setParticipant($this->users[0])->perPage(3)->getMessages()->count());

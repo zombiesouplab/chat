@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Musonza\Chat\BaseModel;
 
-class ConversationParticipant extends BaseModel
+class Participation extends BaseModel
 {
 //    use SoftDeletes;
 
-    protected $table = 'mc_conversation_participant';
+    protected $table = 'mc_participation';
     protected $fillable = [
         'conversation_id',
     ];
@@ -23,5 +23,10 @@ class ConversationParticipant extends BaseModel
     public function conversation()
     {
         return $this->belongsTo(Conversation::class, 'conversation_id');
+    }
+
+    public function messageable()
+    {
+        return $this->morphTo();
     }
 }
