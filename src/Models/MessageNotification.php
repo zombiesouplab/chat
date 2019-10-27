@@ -5,13 +5,14 @@ namespace Musonza\Chat\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Musonza\Chat\BaseModel;
+use Musonza\Chat\ConfigurationManager;
 
 class MessageNotification extends BaseModel
 {
     use SoftDeletes;
 
+    protected $table = ConfigurationManager::MESSAGE_NOTIFICATIONS_TABLE;
     protected $fillable = ['messageable_id', 'messageable_type', 'message_id', 'conversation_id'];
-    protected $table = 'mc_message_notification';
     protected $dates = ['deleted_at'];
 
     /**

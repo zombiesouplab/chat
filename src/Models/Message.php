@@ -5,6 +5,7 @@ namespace Musonza\Chat\Models;
 use Illuminate\Database\Eloquent\Model;
 use Musonza\Chat\BaseModel;
 use Musonza\Chat\Chat;
+use Musonza\Chat\ConfigurationManager;
 use Musonza\Chat\Eventing\EventGenerator;
 
 class Message extends BaseModel
@@ -17,7 +18,7 @@ class Message extends BaseModel
         'type',
     ];
 
-    protected $table = 'mc_messages';
+    protected $table = ConfigurationManager::MESSAGES_TABLE;
     /**
      * All of the relationships to be touched.
      *
@@ -110,7 +111,10 @@ class Message extends BaseModel
         return MessageNotification::where('messageable_id', $participant->getKey())
             ->where('messageable_type', get_class($participant))
             ->where('message_id', $this->id)
-            ->select(['mc_message_notification.*', 'mc_message_notification.updated_at as read_at'])
+            ->select([
+                '*',
+                'updated_at as read_at'
+            ])
             ->first();
     }
 

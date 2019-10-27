@@ -10,10 +10,11 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Musonza\Chat\BaseModel;
 use Musonza\Chat\Chat;
+use Musonza\Chat\ConfigurationManager;
 
 class Conversation extends BaseModel
 {
-    protected $table = 'mc_conversations';
+    protected $table = ConfigurationManager::CONVERSATIONS_TABLE;
     protected $fillable = ['data'];
     protected $casts = [
         'data' => 'array',
@@ -172,11 +173,7 @@ class Conversation extends BaseModel
      */
     public function participantConversations(Model $participant): Collection
     {
-        return $this->join('mc_participation', 'mc_participation.conversation_id', '=', 'mc_conversations.id')
-            ->where('mc_participation.messageable_id', $participant->getKey())
-            ->where('mc_participation.messageable_type', get_class($participant))
-            ->where('private', true)
-            ->pluck('mc_conversations.id');
+        return $participant->participation->pluck('conversation');
     }
 
     /**

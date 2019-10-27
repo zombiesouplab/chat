@@ -4,6 +4,7 @@ namespace Musonza\Chat\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Musonza\Chat\Models\Conversation;
 use Musonza\Chat\Models\Message;
 use Musonza\Chat\Traits\Paginates;
@@ -80,11 +81,17 @@ class ConversationService
      */
     public function between(Model $participantOne, Model $participantTwo)
     {
-        $conversation1 = $this->conversation->participantConversations($participantOne)->toArray();
-        $conversation2 = $this->conversation->participantConversations($participantTwo)->toArray();
-        $common_conversations = $this->getConversationsInCommon($conversation1, $conversation2);
+        $participantOneConversationIds = $this->conversation
+            ->participantConversations($participantOne)
+            ->pluck('id');
 
-        return $common_conversations ? $this->conversation->findOrFail($common_conversations[0]) : null;
+        $participantTwoConversationIds = $this->conversation
+            ->participantConversations($participantTwo)
+            ->pluck('id');
+
+        $common = $this->getConversationsInCommon($participantOneConversationIds, $participantTwoConversationIds);
+
+        return $common ? $this->conversation->findOrFail($common[0]) : null;
     }
 
     /**
@@ -139,14 +146,14 @@ class ConversationService
     /**
      * Gets the conversations in common.
      *
-     * @param array $conversation1 The conversations for user one
-     * @param array $conversation2 The conversations for user two
+     * @param Collection $conversation1 The conversation Ids for user one
+     * @param Collection $conversation2 The conversation Ids for user two
      *
      * @return Conversation The conversations in common.
      */
-    private function getConversationsInCommon($conversation1, $conversation2)
+    private function getConversationsInCommon(Collection $conversation1, Collection $conversation2)
     {
-        return array_values(array_intersect($conversation1, $conversation2));
+        return array_values(array_intersect($conversation1->toArray(), $conversation2->toArray()));
     }
 
     /**

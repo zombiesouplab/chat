@@ -7,6 +7,7 @@ require __DIR__.'/Helpers/migrations.php';
 
 use CreateChatTables;
 use CreateTestTables;
+use Illuminate\Foundation\Application;
 use Musonza\Chat\ChatServiceProvider;
 use Musonza\Chat\Facades\ChatFacade;
 use Musonza\Chat\Tests\Helpers\Models\User;
@@ -27,7 +28,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void
     {
         parent::setUp();
-
         $this->artisan('migrate', ['--database' => 'testbench']);
         $this->withFactories(__DIR__.'/Helpers/factories');
         $this->migrate();
@@ -51,7 +51,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     /**
      * Define environment setup.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      *
      * @return void
      */

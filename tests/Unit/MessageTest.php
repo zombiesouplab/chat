@@ -9,6 +9,7 @@ use Musonza\Chat\Models\Message;
 use Musonza\Chat\Tests\Helpers\Models\Bot;
 use Musonza\Chat\Tests\Helpers\Models\Client;
 use Musonza\Chat\Tests\Helpers\Models\User;
+use DB;
 
 class MessageTest extends TestCase
 {
