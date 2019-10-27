@@ -298,9 +298,6 @@ Chat::conversation($conversation)->addParticipants([$participantModel]);
 Chat::conversation($conversation)->addParticipants([$participantModel, $participantModel2]);
 ```
 
-<b>Note:</b> By default, a third participant will classify the conversation as not private if it was. See config on how to change this.
-
-
 #### Get messages in a conversation
 
 ```php
