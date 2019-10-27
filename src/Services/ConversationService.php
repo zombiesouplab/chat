@@ -5,6 +5,7 @@ namespace Musonza\Chat\Services;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Musonza\Chat\Exceptions\InvalidDirectMessageNumberOfParticipants;
 use Musonza\Chat\Models\Conversation;
 use Musonza\Chat\Models\Message;
 use Musonza\Chat\Traits\Paginates;
@@ -115,6 +116,7 @@ class ConversationService
      * @param int | array $userId / array of user ids or an integer
      *
      * @return Conversation
+     * @throws InvalidDirectMessageNumberOfParticipants
      */
     public function addParticipants($userId)
     {
@@ -166,6 +168,20 @@ class ConversationService
     public function isPrivate($isPrivate = true)
     {
         $this->filters['private'] = $isPrivate;
+
+        return $this;
+    }
+
+    /**
+     * Sets the conversation type to query for direct conversations.
+     *
+     * @param bool $isDirectMessage
+     *
+     * @return $this
+     */
+    public function isDirect($isDirectMessage = true)
+    {
+        $this->filters['direct_message'] = $isDirectMessage;
 
         return $this;
     }

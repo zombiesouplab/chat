@@ -313,6 +313,9 @@ $conversations = Chat::conversations()->setParticipant($participantModel)->isPri
 // public conversations
 $conversations = Chat::conversations()->setParticipant($participantModel)->isPrivate(false)->get();
 
+// direct conversations / messages
+$conversations = Chat::conversations()->setParticipant($participantModel)->isDirect()->get();
+
 // all conversations
 $conversations = Chat::conversations()->setParticipant($participantModel)->get();
 ```

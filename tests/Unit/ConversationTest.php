@@ -285,14 +285,18 @@ class ConversationTest extends TestCase
         Chat::createConversation([$this->users[0], $this->users[1]])->makePrivate();
         Chat::createConversation([$this->users[0], $this->users[1]])->makePrivate(false);
         Chat::createConversation([$this->users[0], $this->users[1]])->makePrivate();
+        Chat::createConversation([$this->users[0], $this->users[2]])->makeDirect();
 
         $allConversations = Chat::conversations()->setParticipant($this->users[0])->get();
-        $this->assertCount(3, $allConversations);
+        $this->assertCount(4, $allConversations, 'All Conversations');
 
         $privateConversations = Chat::conversations()->setParticipant($this->users[0])->isPrivate()->get();
-        $this->assertCount(2, $privateConversations);
+        $this->assertCount(3, $privateConversations, 'Private Conversations');
 
         $publicConversations = Chat::conversations()->setParticipant($this->users[0])->isPrivate(false)->get();
-        $this->assertCount(1, $publicConversations);
+        $this->assertCount(1, $publicConversations, 'Public Conversations');
+
+        $directConversations = Chat::conversations()->setParticipant($this->users[0])->isDirect()->get();
+        $this->assertCount(1, $directConversations, 'Direct Conversations');
     }
 }

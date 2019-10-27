@@ -178,7 +178,7 @@ class Conversation extends BaseModel
             throw new InvalidDirectMessageNumberOfParticipants();
         }
 
-        $this->ensureNoDirectMessaging();
+        $this->ensureNoDirectMessagingExist();
 
         $this->direct_message = $isDirect;
         $this->save();
@@ -186,7 +186,7 @@ class Conversation extends BaseModel
         return $this;
     }
 
-    private function ensureNoDirectMessaging()
+    private function ensureNoDirectMessagingExist()
     {
         $participants = $this->participants()->get()->pluck('messageable');
 
