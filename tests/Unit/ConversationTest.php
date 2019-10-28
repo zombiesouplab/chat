@@ -334,13 +334,9 @@ class ConversationTest extends TestCase
             ->setParticipant($this->users[0])
             ->updateSettings($settings);
 
-        $this->assertDatabaseHas(
-            ConfigurationManager::PARTICIPATION_TABLE,
-            [
-                'messageable_type' => get_class($this->users[0]),
-                'messageable_id'   => $this->users[0]->getKey(),
-                'settings'         => json_encode($settings),
-            ]
+        $this->assertEquals(
+            $settings,
+            $this->users[0]->participation->where('conversation_id', $conversation->id)->first()->settings
         );
     }
 }
