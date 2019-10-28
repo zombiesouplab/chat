@@ -16,7 +16,7 @@ use Orchestra\Database\ConsoleServiceProvider;
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $conversation;
-    protected $prefix = 'mc_';
+    protected $prefix = 'chat_';
     protected $userModelPrimaryKey;
     public $users;
 

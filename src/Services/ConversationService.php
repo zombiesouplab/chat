@@ -185,6 +185,9 @@ class ConversationService
     {
         $this->filters['direct_message'] = $isDirectMessage;
 
+        // Direct messages are always private
+        $this->filters['private'] = true;
+
         return $this;
     }
 

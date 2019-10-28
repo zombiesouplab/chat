@@ -8,6 +8,7 @@ use Musonza\Chat\ConfigurationManager;
 use Musonza\Chat\Exceptions\DirectMessagingExistsException;
 use Musonza\Chat\Exceptions\InvalidDirectMessageNumberOfParticipants;
 use Musonza\Chat\Models\Conversation;
+use Musonza\Chat\Models\Participation;
 use Musonza\Chat\Tests\Helpers\Models\Client;
 
 class ConversationTest extends TestCase
@@ -176,18 +177,31 @@ class ConversationTest extends TestCase
     }
 
     /** @test */
+//    public function it_cool()
+//    {
+//        $conversation = Chat::createConversation([$this->users[0], $this->users[1]]);
+//        Chat::message('Hello & Bye')->from($this->users[0])->to($conversation)->send();
+//
+//        $conversations = Chat::conversations()->setParticipant($this->users[0])->get();
+//    }
+
+    /** @test */
     public function it_returns_correct_attributes_in_last_message()
     {
         $conversation = Chat::createConversation([$this->users[0], $this->users[1]]);
         Chat::message('Hello')->from($this->users[0])->to($conversation)->send();
 
+//        $conversation = Chat::createConversation([$this->users[0], $this->users[2]]);
+
         $conversations = Chat::conversations()->setParticipant($this->users[0])->get();
 
-        $this->assertTrue((bool) $conversations->get(0)->last_message->is_seen);
+//        dd($conversations->toArray());
+
+        $this->assertTrue((bool) $conversations->get(0)->conversation->last_message->is_seen);
 
         $conversations = Chat::conversations()->setParticipant($this->users[1])->get();
 
-        $this->assertFalse((bool) $conversations->get(0)->last_message->is_seen);
+        $this->assertFalse((bool) $conversations->get(0)->conversation->last_message->is_seen);
     }
 
     /** @test */
@@ -196,6 +210,7 @@ class ConversationTest extends TestCase
         $auth = $this->users[0];
 
         $conversation = Chat::createConversation([$auth, $this->users[1]]);
+
         Chat::message('Hello-'.$conversation->id)->from($auth)->to($conversation)->send();
 
         $conversation = Chat::createConversation([$auth, $this->users[2]]);
@@ -205,13 +220,14 @@ class ConversationTest extends TestCase
         Chat::message('Hello-'.$conversation->id)->from($auth)->to($conversation)->send();
 
         $conversations = Chat::conversations()->setPaginationParams(['sorting' => 'desc'])->setParticipant($auth)->limit(1)->page(1)->get();
-        $this->assertEquals('Hello-3', $conversations->items()[0]->last_message->body);
+
+        $this->assertEquals('Hello-3', $conversations->items()[0]->conversation->last_message->body);
 
         $conversations = Chat::conversations()->setPaginationParams(['sorting' => 'desc'])->setParticipant($auth)->limit(1)->page(2)->get();
-        $this->assertEquals('Hello-2', $conversations->items()[0]->last_message->body);
+        $this->assertEquals('Hello-2', $conversations->items()[0]->conversation->last_message->body);
 
         $conversations = Chat::conversations()->setPaginationParams(['sorting' => 'desc'])->setParticipant($auth)->limit(1)->page(3)->get();
-        $this->assertEquals('Hello-1', $conversations->items()[0]->last_message->body);
+        $this->assertEquals('Hello-1', $conversations->items()[0]->conversation->last_message->body);
     }
 
     /** @test */
@@ -298,6 +314,7 @@ class ConversationTest extends TestCase
         $this->assertCount(1, $publicConversations, 'Public Conversations');
 
         $directConversations = Chat::conversations()->setParticipant($this->users[0])->isDirect()->get();
+
         $this->assertCount(1, $directConversations, 'Direct Conversations');
     }
 
