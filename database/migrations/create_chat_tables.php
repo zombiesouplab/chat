@@ -46,7 +46,7 @@ class CreateChatTables extends Migration
             $table->bigInteger('conversation_id')->unsigned();
             $table->bigInteger('messageable_id')->unsigned();
             $table->string('messageable_type');
-            $table->json('settings')->nullable();
+            $table->text('settings')->nullable();
             $table->timestamps();
 
             $table->unique(['conversation_id', 'messageable_id', 'messageable_type'], 'participation_index');
