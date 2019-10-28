@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Musonza\Chat\Eventing\ConversationStarted;
 use Musonza\Chat\Models\Conversation;
 use Musonza\Chat\Models\Message;
+use Musonza\Chat\Models\Participation;
 use Musonza\Chat\Traits\Paginates;
 use Musonza\Chat\Traits\SetsParticipants;
 
@@ -192,9 +193,13 @@ class ConversationService
 
     public function updateSettings(array $settings)
     {
-        $this->participant
+        /** @var Participation $participation */
+        $participation = $this->participant
             ->participation()
             ->where('conversation_id', $this->conversation->getKey())
-            ->update(['settings' => $settings]);
+            ->first();
+
+        $participation->settings = $settings;
+        $participation->save();
     }
 }
