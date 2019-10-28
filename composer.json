@@ -9,13 +9,13 @@
         "conversation"
     ],
     "require": {
-        "php": ">=7.1",
-        "laravel/framework": "6.0"
+        "php": "^7.2",
+        "laravel/framework": "^6.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "*",
-        "orchestra/testbench": "*",
-        "orchestra/database": "*",
+        "phpunit/phpunit": "^8.0",
+        "orchestra/testbench": "^4.0",
+        "orchestra/database": "^4.0",
         "mockery/mockery": "^1.0.0"
     },
     "license": "MIT",
