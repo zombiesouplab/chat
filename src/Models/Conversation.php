@@ -104,7 +104,7 @@ class Conversation extends BaseModel
             $participant->joinConversation($this);
         }
 
-        event(new ParticipantsJoined($this,  $participants));
+        event(new ParticipantsJoined($this, $participants));
 
         return $this;
     }
@@ -123,14 +123,14 @@ class Conversation extends BaseModel
                 $participant->leaveConversation($this->getKey());
             }
 
-            event(new ParticipantsLeft($this,  $participants));
+            event(new ParticipantsLeft($this, $participants));
 
             return $this;
         }
 
         $participants->leaveConversation($this->getKey());
 
-        event(new ParticipantsLeft($this,  [$participants]));
+        event(new ParticipantsLeft($this, [$participants]));
 
         return $this;
     }
