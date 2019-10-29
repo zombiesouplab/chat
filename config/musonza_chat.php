@@ -22,5 +22,10 @@ return [
      * However, if using multiple Models it's recommended to add getParticipantDetails to each
      * Model you want to control fields output.
      */
+
+    /*
+     * Specify the fields that you want to return each time for the sender.
+     * If not set or empty, all the columns for the sender will be returned
+     */
     'sender_fields_whitelist' => [],
 ];

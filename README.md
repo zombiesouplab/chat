@@ -11,6 +11,8 @@ Create a Chat application for your Laravel Models
 
 <details><summary>Click to expand</summary><p>
 
+Want to use any Laravel model as Chat participant? Follow this PR https://github.com/musonza/chat/pull/163
+
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)

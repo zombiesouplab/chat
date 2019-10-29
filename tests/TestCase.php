@@ -19,9 +19,13 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected $prefix = 'chat_';
     protected $userModelPrimaryKey;
     public $users;
+    /** @var User */
     protected $alpha;
+    /** @var User */
     protected $bravo;
+    /** @var User */
     protected $charlie;
+    /** @var User */
     protected $delta;
 
     public function __construct()

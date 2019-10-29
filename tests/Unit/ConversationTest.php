@@ -44,6 +44,7 @@ class ConversationTest extends TestCase
     /** @test */
     public function it_can_mark_a_conversation_as_read()
     {
+        /** @var Conversation $conversation */
         $conversation = Chat::createConversation([
             $this->alpha,
             $this->bravo,
@@ -325,5 +326,16 @@ class ConversationTest extends TestCase
             $settings,
             $this->alpha->participation->where('conversation_id', $conversation->id)->first()->settings
         );
+    }
+
+    /** @test */
+    public function it_specifies_fields_to_return_for_sender()
+    {
+        $this->app['config']->set('musonza_chat.sender_fields_whitelist', ['uid', 'email']);
+
+        $conversation = Chat::createConversation([$this->alpha, $this->bravo]);
+        $message = Chat::message('Hello')->from($this->alpha)->to($conversation)->send();
+
+        $this->assertSame(['uid', 'email'], array_keys($message->sender));
     }
 }
