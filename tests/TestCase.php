@@ -19,6 +19,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected $prefix = 'chat_';
     protected $userModelPrimaryKey;
     public $users;
+    protected $alpha;
+    protected $bravo;
+    protected $charlie;
+    protected $delta;
 
     public function __construct()
     {
@@ -32,6 +36,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $this->withFactories(__DIR__.'/Helpers/factories');
         $this->migrate();
         $this->users = $this->createUsers(6);
+        list($this->alpha, $this->bravo, $this->charlie, $this->delta) = $this->users;
     }
 
     protected function migrateTestTables()

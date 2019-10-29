@@ -44,7 +44,15 @@ class Message extends BaseModel
 
     public function getSenderAttribute()
     {
-        return $this->participation->messageable;
+        $participantModel = $this->participation->messageable;
+
+        if (method_exists($participantModel, 'getParticipantDetails')) {
+            return $participantModel->getParticipantDetails();
+        }
+
+        $fields =  Chat::senderFieldsWhitelist();
+
+        return $fields ? $this->participation->messageable->only($fields) : $this->participation->messageable;
     }
 
     public function unreadCount(Model $participant)

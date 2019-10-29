@@ -9,13 +9,6 @@ class User extends Model
 {
     use Messageable;
     protected $table = 'mc_users';
-
-    public function getParticipantDetailsAttribute()
-    {
-        return [
-            'name' => $this->name,
-        ];
-    }
 }
 
 class Client extends Model
@@ -24,7 +17,7 @@ class Client extends Model
     protected $table = 'mc_clients';
     protected $primaryKey = 'client_id';
 
-    public function getParticipantDetailsAttribute()
+    public function getParticipantDetails()
     {
         return [
             'name' => $this->name,

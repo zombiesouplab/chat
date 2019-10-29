@@ -120,4 +120,10 @@ class Chat
     {
         return config('musonza_chat.sent_message_event');
     }
+
+    public static function senderFieldsWhitelist()
+    {
+        $fields = config('musonza_chat.sender_fields_whitelist', []);
+        return (is_array($fields) && !empty($fields)) ? $fields : null;
+    }
 }
