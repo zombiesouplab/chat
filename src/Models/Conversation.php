@@ -340,12 +340,7 @@ class Conversation extends BaseModel
             ->orderBy('c.updated_at', 'DESC')
             ->orderBy('c.id', 'DESC')
             ->distinct('c.id')
-            ->paginate(
-                $options['perPage'],
-                ['chat_participation.*'],
-                $options['pageName'],
-                $options['page']
-            );
+            ->paginate($options['perPage'], ['chat_participation.*'], $options['pageName'], $options['page']);
     }
 
     private function notifications(Model $participant, $readAll)
