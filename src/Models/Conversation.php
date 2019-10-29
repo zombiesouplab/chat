@@ -73,13 +73,7 @@ class Conversation extends BaseModel
 
     public function getParticipantConversations($participant, array $options)
     {
-        return $this->getConversationsList(
-            $participant,
-            $options['perPage'],
-            $options['page'],
-            $options['pageName'],
-            $options['filters']
-        );
+        return $this->getConversationsList($participant, $options);
     }
 
     public function participantFromSender(Model $sender)
@@ -314,14 +308,10 @@ class Conversation extends BaseModel
 
     /**
      * @param Model $participant
-     * @param $perPage
-     * @param $page
-     * @param $pageName
-     * @param $filters
-     *
+     * @param $options
      * @return mixed
      */
-    private function getConversationsList(Model $participant, $perPage, $page, $pageName, $filters = [])
+    private function getConversationsList(Model $participant, $options)
     {
         /** @var Builder $paginator */
         $paginator = $participant->participation()
@@ -338,12 +328,12 @@ class Conversation extends BaseModel
             ])
             ->where('chat_participation.messageable_id', $participant->getKey());
 
-        if (isset($filters['private'])) {
-            $paginator = $paginator->where('c.private', (bool) $filters['private']);
+        if (isset( $options['filters']['private'])) {
+            $paginator = $paginator->where('c.private', (bool) $options['filters']['private']);
         }
 
-        if (isset($filters['direct_message'])) {
-            $paginator = $paginator->where('c.direct_message', (bool) $filters['direct_message']);
+        if (isset( $options['filters']['direct_message'])) {
+            $paginator = $paginator->where('c.direct_message', (bool)  $options['filters']['direct_message']);
         }
 
         return $paginator
@@ -351,13 +341,11 @@ class Conversation extends BaseModel
             ->orderBy('c.id', 'DESC')
             ->distinct('c.id')
             ->paginate(
-            $perPage,
-            [
-                'chat_participation.*',
-            ],
-            $pageName,
-            $page
-        );
+                $options['perPage'],
+                ['chat_participation.*'],
+                $options['pageName'],
+                $options['page']
+            );
     }
 
     private function notifications(Model $participant, $readAll)
