@@ -5,7 +5,7 @@
 [![Packagist](https://img.shields.io/packagist/v/musonza/chat.svg)](https://packagist.org/packages/musonza/chat)
 ## Chat
 
-Create a Chat application for your Laravel Models
+Create a Chat application for your multiple Models
 
 ## Table of Contents
 
