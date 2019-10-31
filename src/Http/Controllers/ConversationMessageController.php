@@ -3,6 +3,8 @@
 namespace Musonza\Chat\Http\Controllers;
 
 use Chat;
+use Musonza\Chat\Http\Requests\ClearConversation;
+use Musonza\Chat\Http\Requests\DeleteMessage;
 use Musonza\Chat\Http\Requests\GetParticipantMessages;
 use Musonza\Chat\Http\Requests\StoreMessage;
 
@@ -28,5 +30,25 @@ class ConversationMessageController extends Controller
             ->send();
 
         return response($message);
+    }
+
+    public function deleteAll(ClearConversation $request, $conversationId)
+    {
+        $conversation = Chat::conversations()->getById($conversationId);
+        Chat::conversation($conversation)
+            ->setParticipant($request->getParticipant())
+            ->clear();
+
+        return response('');
+    }
+
+    public function destroy(DeleteMessage $request, $conversationId, $messageId)
+    {
+        $message = Chat::messages()->getById($messageId);
+        Chat::message($message)
+            ->setParticipant($request->getParticipant())
+            ->delete();
+
+        return response("");
     }
 }

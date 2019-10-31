@@ -38,9 +38,8 @@ Route::group([
         ->name('conversations.messages.store');
     Route::get('/conversations/{id}/messages', 'ConversationMessageController@index')
         ->name('conversations.messages.index');
-    Route::get('/conversations/{id}participants', 'ConversationParticipationController@index');
-    Route::get('/conversations/{id}/participants/{participation_id}', 'ConversationParticipationController@show')
-        ->name('conversations.participation.show');
-    Route::put('/conversations/{id}/participants/{participation_id}', 'ConversationParticipationController@update')
-        ->name('conversations.participation.update');
+    Route::delete('/conversations/{id}/messages', 'ConversationMessageController@deleteAll')
+        ->name('conversations.messages.destroy.all');
+    Route::delete('/conversations/{id}/messages/{message_id}', 'ConversationMessageController@destroy')
+        ->name('conversations.messages.destroy');
 });

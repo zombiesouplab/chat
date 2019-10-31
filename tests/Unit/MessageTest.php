@@ -94,8 +94,6 @@ class MessageTest extends TestCase
     {
         $conversation = Chat::createConversation([$this->alpha, $this->bravo]);
         $message = Chat::message('Hello there 0')->from($this->alpha)->to($conversation)->send();
-
-        $messageId = 1;
         $perPage = 5;
         $page = 1;
 
