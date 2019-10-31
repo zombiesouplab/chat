@@ -163,7 +163,7 @@ $conversation->update(['data' => $data]);
 
 ```php
 $message = Chat::message('Hello')
-            ->from($model1)
+            ->from($model)
             ->to($conversation)
             ->send();
 ```
@@ -174,7 +174,7 @@ The default message type is `text`. If you want to specify custom type you can c
 ```php
 $message = Chat::message('http://example.com/img')
 		->type('image')
-		->from($model1)
+		->from($model)
 		->to($conversation)
 		->send();
 ```
