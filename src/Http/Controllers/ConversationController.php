@@ -15,6 +15,12 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class ConversationController extends Controller
 {
+    public function index()
+    {
+        $conversations = Chat::conversations()->conversation->all();
+        return response($conversations);
+    }
+
     public function store(StoreConversation $request)
     {
         $participants = $request->participants();

@@ -5,6 +5,7 @@ namespace Musonza\Chat\Http\Controllers;
 use Chat;
 use Musonza\Chat\Http\Requests\StoreParticipation;
 use Musonza\Chat\Http\Requests\UpdateParticipation;
+use Musonza\Chat\Models\Conversation;
 use Musonza\Chat\Models\Participation;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,9 +21,10 @@ class ConversationParticipationController extends Controller
 
     public function index($conversationId)
     {
+        /** @var Conversation $conversation */
         $conversation = Chat::conversations()->getById($conversationId);
 
-        return response($conversation->participants);
+        return response($conversation->getParticipants());
     }
 
     public function show($conversationId, $participationId)

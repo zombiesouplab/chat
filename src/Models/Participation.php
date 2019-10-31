@@ -33,6 +33,6 @@ class Participation extends BaseModel
 
     public function messageable()
     {
-        return $this->morphTo();
+        return $this->morphTo()->with('participation');
     }
 }
