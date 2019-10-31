@@ -68,30 +68,7 @@ This will publish database migrations and a configuration file `musonza_chat.php
 
 ## Configuration
 
-```php
-return [
-    /*
-     * This will allow you to broadcast an event when a message is sent
-     * Example:
-     * Channel: mc-chat-conversation.2,
-     * Event: Musonza\Chat\Eventing\MessageWasSent
-     */
-    'broadcasts' => false,
-
-    /**
-     * The event to fire when a message is sent
-     * See Musonza\Chat\Eventing\MessageWasSent if you want to customize.
-     */
-    'sent_message_event' => 'Musonza\Chat\Eventing\MessageWasSent',
-
-    /**
-     * Automatically convert conversations with more than two participants to public
-     */
-    'make_three_or_more_participants_public' => true,
-];
-
-
-```
+See `musonza_chat.php` for configuration
 
 Run the migrations:
 
@@ -355,7 +332,7 @@ To get the `conversations` simply call `$paginated->items()`
 #### Get participants in a conversation
 
 ```php
-$participants = $conversation->participants;
+$participants = $conversation->getParticipants();
 ```
 
 #### Get participation entry for a Model in a conversation
