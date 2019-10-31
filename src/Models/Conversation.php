@@ -209,8 +209,7 @@ class Conversation extends BaseModel
      */
     private function ensureNoDirectMessagingExist()
     {
-        $participants = $this->participants()->get()->pluck('messageable')->toArray();
-        dd($participants);
+        $participants = $this->participants()->get()->pluck('messageable');
         $common = Chat::conversations()->between($participants[0], $participants[1]);
 
         if (!is_null($common)) {
