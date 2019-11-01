@@ -10,6 +10,29 @@ use Musonza\Chat\Http\Requests\StoreMessage;
 
 class ConversationMessageController extends Controller
 {
+    protected $messageTransformer;
+
+    public function __construct()
+    {
+        $this->setUp();
+    }
+
+    private function setUp()
+    {
+        if ($messageTransformer = config('musonza_chat.transformers.message')) {
+            $this->messageTransformer = app($messageTransformer);
+        }
+    }
+
+    private function itemResponse($message)
+    {
+        if ($this->messageTransformer) {
+            return fractal($message, $this->messageTransformer)->respond();
+        }
+
+        return response($message);
+    }
+
     public function index(GetParticipantMessages $request, $conversationId)
     {
         $conversation = Chat::conversations()->getById($conversationId);
@@ -18,7 +41,18 @@ class ConversationMessageController extends Controller
             ->setPaginationParams($request->getPaginationParams())
             ->getMessages();
 
+        if ($this->messageTransformer) {
+            return fractal($message, $this->messageTransformer)->respond();
+        }
+
         return response($message);
+    }
+
+    public function show(GetParticipantMessages $request, $conversationId, $messageId)
+    {
+        $message = Chat::messages()->getById($messageId);
+
+        return $this->itemResponse($message);
     }
 
     public function store(StoreMessage $request, $conversationId)
@@ -29,7 +63,7 @@ class ConversationMessageController extends Controller
             ->to($conversation)
             ->send();
 
-        return response($message);
+        return $this->itemResponse($message);
     }
 
     public function deleteAll(ClearConversation $request, $conversationId)
