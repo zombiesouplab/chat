@@ -40,6 +40,7 @@ Want to use any Laravel model as Chat participant? Follow this PR https://github
   - [Get participants in a conversation](#get-participants-in-a-conversation)
   - [Get participation entry for a Model in a conversation](#Get-participation-entry-for-a-Model-in-a-conversation)
   - [Update participation settings](#Update-participation-settings)
+  - [Data Transformers](#Data-Transformers)
 - [License](#license)
 
 </details>
@@ -354,7 +355,7 @@ Chat::conversation($conversation)
     ->update(['settings' => $settings]);
 ```
 
-#### Data Transformers (recommended)
+#### Data Transformers
 
 Need to have more control on the data returned from the package routes? You can 
 specify your own Model transformers and take advantage of [Fractal](http://fractal.thephpleague.com/).
