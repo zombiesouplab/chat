@@ -356,7 +356,7 @@ Chat::conversation($conversation)
 
 #### Data Transformers (recommended)
 
-Need to have more control on the data returned from the package? You can 
+Need to have more control on the data returned from the package routes? You can 
 specify your own Model transformers and take advantage of [Fractal](http://fractal.thephpleague.com/).
 
 All you need to do is specify the location of your transformers in the configuration
@@ -372,7 +372,7 @@ file `musonza_chat.php` as follows:
     'participant' => \MyApp\Transformers\ParticipantTransformer::class,
 ]
 ```
-
+> **Note:** This only applies to responses from package routes. 
 
 ## License
 
