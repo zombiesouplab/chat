@@ -52,4 +52,13 @@ return [
         'columns'  => ['*'],
         'pageName' => 'page',
     ],
+
+    /*
+     * Model Transformers
+     */
+    'transformers' => [
+        'conversation' => null,
+        'message'      => null,
+        'participant'  => null,
+    ],
 ];

@@ -144,7 +144,8 @@ $conversation = Chat::createConversation($participants)->makePrivate(false);
 // Create a direct message
 $conversation = Chat::createConversation($participants)->makeDirect();
 ```
-Note: You will not be able to add additional participants to a direct conversation. 
+
+> **Note:** You will not be able to add additional participants to a direct conversation. 
 Additionally you can't remove a participant from a direct conversation.
 
 #### Get a conversation by id
@@ -352,6 +353,26 @@ Chat::conversation($conversation)
     ->getParticipation()
     ->update(['settings' => $settings]);
 ```
+
+#### Data Transformers (recommended)
+
+Need to have more control on the data returned from the package routes? You can 
+specify your own Model transformers and take advantage of [Fractal](http://fractal.thephpleague.com/).
+
+All you need to do is specify the location of your transformers in the configuration
+file `musonza_chat.php` as follows:
+
+```php
+/**
+ * Model Transformers
+ */
+'transformers' => [
+    'conversation' => \MyApp\Transformers\ConversationTransformer::class,
+    'message' => \MyApp\Transformers\MessageTransformer::class,
+    'participant' => \MyApp\Transformers\ParticipantTransformer::class,
+]
+```
+> **Note:** This only applies to responses from package routes. 
 
 ## License
 
