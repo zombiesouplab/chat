@@ -7,6 +7,7 @@ use Musonza\Chat\BaseModel;
 use Musonza\Chat\Chat;
 use Musonza\Chat\ConfigurationManager;
 use Musonza\Chat\Eventing\EventGenerator;
+use Musonza\Chat\Eventing\MessageWasSent;
 
 class Message extends BaseModel
 {
@@ -86,11 +87,23 @@ class Message extends BaseModel
             'type'             => $type,
         ]);
 
-        $messageWasSent = Chat::sentMessageEvent();
-        $this->raise(new $messageWasSent($message));
+        broadcast(new MessageWasSent($message))->toOthers();
+
+        $this->createNotifications($message);
 
         return $message;
     }
+
+    /**
+     * Creates an entry in the message_notification table for each participant
+     * This will be used to determine if a message is read or deleted.
+     * @param Message $message
+     */
+    protected function createNotifications($message)
+    {
+        MessageNotification::make($message, $message->conversation);
+    }
+
 
     /**
      * Deletes a message for the participant.

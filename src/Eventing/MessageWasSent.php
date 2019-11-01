@@ -9,6 +9,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Musonza\Chat\Models\Message;
 use Musonza\Chat\Models\MessageNotification;
+use Illuminate\Broadcasting\PrivateChannel;
 
 class MessageWasSent extends Event implements ShouldBroadcast
 {
@@ -19,17 +20,6 @@ class MessageWasSent extends Event implements ShouldBroadcast
     public function __construct(Message $message)
     {
         $this->message = $message;
-
-        $this->createNotifications();
-    }
-
-    /**
-     * Creates an entry in the message_notification table for each participant
-     * This will be used to determine if a message is read or deleted.
-     */
-    public function createNotifications()
-    {
-        MessageNotification::make($this->message, $this->message->conversation);
     }
 
     /**
@@ -39,6 +29,12 @@ class MessageWasSent extends Event implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('mc-chat-conversation.'.$this->message->conversation->id);
+        return new PrivateChannel('mc-chat-conversation.'.$this->message->conversation->id);
     }
+
+    // configure this
+//    public function broadcastWith()
+//    {
+//        return [];
+//    }
 }
