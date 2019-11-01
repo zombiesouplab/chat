@@ -15,6 +15,8 @@ class ConversationControllerTest extends TestCase
 {
     public function testStore()
     {
+        $this->withoutExceptionHandling();
+
         /** @var User $userModel */
         $userModel = factory(User::class)->create();
         $clientModel = factory(Client::class)->create();

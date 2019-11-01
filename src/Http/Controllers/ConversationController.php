@@ -15,9 +15,39 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class ConversationController extends Controller
 {
+    protected $conversationTransformer;
+
+    public function __construct()
+    {
+        $this->setUp();
+    }
+
+    private function setUp()
+    {
+        if ($conversationTransformer = config('musonza_chat.transformers.conversation')) {
+            $this->conversationTransformer = app($conversationTransformer);
+        }
+    }
+
+    private function itemResponse($conversation)
+    {
+        if ($this->conversationTransformer) {
+            return fractal($conversation, $this->conversationTransformer)->respond();
+        }
+
+        return response($conversation);
+    }
+
     public function index()
     {
         $conversations = Chat::conversations()->conversation->all();
+
+        if ($this->conversationTransformer) {
+            return fractal()
+                ->collection($conversations)
+                ->transformWith($this->conversationTransformer)
+                ->respond();
+        }
 
         return response($conversations);
     }
@@ -27,14 +57,14 @@ class ConversationController extends Controller
         $participants = $request->participants();
         $conversation = Chat::createConversation($participants, $request->input('data', []));
 
-        return response($conversation);
+        return $this->itemResponse($conversation);
     }
 
     public function show($id)
     {
         $conversation = Chat::conversations()->getById($id);
 
-        return response($conversation);
+        return $this->itemResponse($conversation);
     }
 
     public function update(UpdateConversation $request, $id)
@@ -43,7 +73,7 @@ class ConversationController extends Controller
         $conversation = Chat::conversations()->getById($id);
         $conversation->update(['data' => $request->validated()['data']]);
 
-        return response($conversation);
+        return $this->itemResponse($conversation);
     }
 
     /**
