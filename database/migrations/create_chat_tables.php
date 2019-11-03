@@ -22,6 +22,22 @@ class CreateChatTables extends Migration
             $table->timestamps();
         });
 
+        Schema::create(ConfigurationManager::PARTICIPATION_TABLE, function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->bigInteger('conversation_id')->unsigned();
+            $table->bigInteger('messageable_id')->unsigned();
+            $table->string('messageable_type');
+            $table->text('settings')->nullable();
+            $table->timestamps();
+
+            $table->unique(['conversation_id', 'messageable_id', 'messageable_type'], 'participation_index');
+
+            $table->foreign('conversation_id')
+                ->references('id')
+                ->on(ConfigurationManager::CONVERSATIONS_TABLE)
+                ->onDelete('cascade');
+        });
+
         Schema::create(ConfigurationManager::MESSAGES_TABLE, function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->text('body');
@@ -34,22 +50,6 @@ class CreateChatTables extends Migration
                 ->references('id')
                 ->on(ConfigurationManager::PARTICIPATION_TABLE)
                 ->onDelete('set null');
-
-            $table->foreign('conversation_id')
-                ->references('id')
-                ->on(ConfigurationManager::CONVERSATIONS_TABLE)
-                ->onDelete('cascade');
-        });
-
-        Schema::create(ConfigurationManager::PARTICIPATION_TABLE, function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->bigInteger('conversation_id')->unsigned();
-            $table->bigInteger('messageable_id')->unsigned();
-            $table->string('messageable_type');
-            $table->text('settings')->nullable();
-            $table->timestamps();
-
-            $table->unique(['conversation_id', 'messageable_id', 'messageable_type'], 'participation_index');
 
             $table->foreign('conversation_id')
                 ->references('id')
@@ -96,9 +96,9 @@ class CreateChatTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(ConfigurationManager::CONVERSATIONS_TABLE);
-        Schema::dropIfExists(ConfigurationManager::PARTICIPATION_TABLE);
         Schema::dropIfExists(ConfigurationManager::MESSAGE_NOTIFICATIONS_TABLE);
         Schema::dropIfExists(ConfigurationManager::MESSAGES_TABLE);
+        Schema::dropIfExists(ConfigurationManager::PARTICIPATION_TABLE);
+        Schema::dropIfExists(ConfigurationManager::CONVERSATIONS_TABLE);
     }
 }
