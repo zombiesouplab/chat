@@ -76,15 +76,25 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'prefix'   => '',
         ]);
 
-        // $app['config']->set('database.default', 'testbench');
-        // $app['config']->set('database.connections.testbench', [
-        //     'driver' => 'mysql',
-        //     'database' => 'chat',
-        //     'username' => 'root',
-        //     'host' => '127.0.0.1',
-        //     'password' => 'my-secret-pw',
-        //     'prefix' => '',
-        // ]);
+//         $app['config']->set('database.default', 'testbench');
+//         $app['config']->set('database.connections.testbench', [
+//             'driver' => 'mysql',
+//             'database' => 'chat',
+//             'username' => 'root',
+//             'host' => '127.0.0.1',
+//             'password' => 'my-secret-pw',
+//             'prefix' => '',
+//             'strict'      => true,
+//             'engine'      => null,
+//             'modes'       => [
+//                 'ONLY_FULL_GROUP_BY',
+//                 'STRICT_TRANS_TABLES',
+//                 'NO_ZERO_IN_DATE',
+//                 'NO_ZERO_DATE',
+//                 'ERROR_FOR_DIVISION_BY_ZERO',
+//                 'NO_ENGINE_SUBSTITUTION',
+//             ],
+//         ]);
 
         $app['config']->set('musonza_chat.user_model', 'Musonza\Chat\Tests\Helpers\Models\User');
         $app['config']->set('musonza_chat.sent_message_event', 'Musonza\Chat\Eventing\MessageWasSent');

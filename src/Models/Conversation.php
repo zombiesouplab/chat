@@ -356,7 +356,7 @@ class Conversation extends BaseModel
             ->orderBy('c.updated_at', 'DESC')
             ->orderBy('c.id', 'DESC')
             ->distinct('c.id')
-            ->paginate($options['perPage'], [$this->tablePrefix.'participation.*'], $options['pageName'], $options['page']);
+            ->paginate($options['perPage'], [$this->tablePrefix.'participation.*', 'c.*'], $options['pageName'], $options['page']);
     }
 
     private function notifications(Model $participant, $readAll)
