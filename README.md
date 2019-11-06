@@ -238,7 +238,11 @@ Chat::conversation($conversation)->setParticipant($participantModel)->clear();
 #### Get participant conversations
 
 ```php
-$participantModel->conversations();
+Chat::conversations()->setPaginationParams(['sorting' => 'desc'])
+	->setParticipant($participantModel)
+	->limit(1)
+	->page(1)
+	->get();
 ```
 
 #### Get a conversation between two participants
