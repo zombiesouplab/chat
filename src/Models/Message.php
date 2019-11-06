@@ -2,16 +2,24 @@
 
 namespace Musonza\Chat\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Musonza\Chat\BaseModel;
 use Musonza\Chat\Chat;
+use Musonza\Chat\ConfigurationManager;
 use Musonza\Chat\Eventing\EventGenerator;
+use Musonza\Chat\Eventing\MessageWasSent;
 
 class Message extends BaseModel
 {
     use EventGenerator;
 
-    protected $fillable = ['body', 'user_id', 'type'];
-    protected $table = 'mc_messages';
+    protected $fillable = [
+        'body',
+        'participation_id',
+        'type',
+    ];
+
+    protected $table = ConfigurationManager::MESSAGES_TABLE;
     /**
      * All of the relationships to be touched.
      *
@@ -28,21 +36,31 @@ class Message extends BaseModel
         'flagged' => 'boolean',
     ];
 
-    public function sender()
+    protected $appends = ['sender'];
+
+    public function participation()
     {
-        $fields = Chat::senderFieldsWhitelist();
-
-        if ($fields) {
-            return $this->belongsTo(Chat::userModel(), 'user_id')->select($fields);
-        }
-
-        return $this->belongsTo(Chat::userModel(), 'user_id');
+        return $this->belongsTo(Participation::class, 'participation_id');
     }
 
-    public function unreadCount($user)
+    public function getSenderAttribute()
     {
-        return MessageNotification::where('user_id', $user->getKey())
+        $participantModel = $this->participation->messageable;
+
+        if (method_exists($participantModel, 'getParticipantDetails')) {
+            return $participantModel->getParticipantDetails();
+        }
+
+        $fields = Chat::senderFieldsWhitelist();
+
+        return $fields ? $this->participation->messageable->only($fields) : $this->participation->messageable;
+    }
+
+    public function unreadCount(Model $participant)
+    {
+        return MessageNotification::where('messageable_id', $participant->getKey())
             ->where('is_seen', 0)
+            ->where('messageable_type', get_class($participant))
             ->count();
     }
 
@@ -54,83 +72,102 @@ class Message extends BaseModel
     /**
      * Adds a message to a conversation.
      *
-     * @param Conversation $conversation
-     * @param string       $body
-     * @param int          $userId
-     * @param string       $type
+     * @param Conversation  $conversation
+     * @param string        $body
+     * @param Participation $participant
+     * @param string        $type
      *
-     * @return Message
+     * @return Model
      */
-    public function send(Conversation $conversation, $body, $userId, $type = 'text')
+    public function send(Conversation $conversation, string $body, Participation $participant, string $type = 'text'): Model
     {
         $message = $conversation->messages()->create([
-            'body'    => $body,
-            'user_id' => $userId,
-            'type'    => $type,
+            'body'             => $body,
+            'participation_id' => $participant->getKey(),
+            'type'             => $type,
         ]);
 
-        $messageWasSent = Chat::sentMessageEvent();
-        $message->load('sender');
-        $this->raise(new $messageWasSent($message));
+        if (Chat::broadcasts()) {
+            broadcast(new MessageWasSent($message))->toOthers();
+        } else {
+            event(new MessageWasSent($message));
+        }
+
+        $this->createNotifications($message);
 
         return $message;
     }
 
     /**
-     * Deletes a message.
+     * Creates an entry in the message_notification table for each participant
+     * This will be used to determine if a message is read or deleted.
      *
      * @param Message $message
-     * @param User    $user
-     *
-     * @return
      */
-    public function trash($user)
+    protected function createNotifications($message)
     {
-        return MessageNotification::where('user_id', $user->getKey())
-            ->where('message_id', $this->id)
+        MessageNotification::make($message, $message->conversation);
+    }
+
+    /**
+     * Deletes a message for the participant.
+     *
+     * @param Model $participant
+     *
+     * @return void
+     */
+    public function trash(Model $participant): void
+    {
+        MessageNotification::where('messageable_id', $participant->getKey())
+            ->where('messageable_type', get_class($participant))
+            ->where('message_id', $this->getKey())
             ->delete();
     }
 
     /**
      * Return user notification for specific message.
      *
-     * @param $user
+     * @param Model $participant
      *
-     * @return Notification
+     * @return MessageNotification
      */
-    public function getNotification($user)
+    public function getNotification(Model $participant): MessageNotification
     {
-        return MessageNotification::where('user_id', $user->getKey())
+        return MessageNotification::where('messageable_id', $participant->getKey())
+            ->where('messageable_type', get_class($participant))
             ->where('message_id', $this->id)
-            ->select(['mc_message_notification.*', 'mc_message_notification.updated_at as read_at'])
+            ->select([
+                '*',
+                'updated_at as read_at',
+            ])
             ->first();
     }
 
     /**
      * Marks message as read.
      *
-     * @param User $user
-     *
-     * @return void
+     * @param $participant
      */
-    public function markRead($user)
+    public function markRead($participant): void
     {
-        $this->getNotification($user)->markAsRead();
+        $this->getNotification($participant)->markAsRead();
     }
 
-    public function flagged($user)
+    public function flagged(Model $participant): bool
     {
-        return (bool) MessageNotification::where('user_id', $user->getKey())
+        return (bool) MessageNotification::where('messageable_id', $participant->getKey())
             ->where('message_id', $this->id)
+            ->where('messageable_type', get_class($participant))
             ->where('flagged', 1)
             ->first();
     }
 
-    public function toggleFlag($user)
+    public function toggleFlag(Model $participant): self
     {
-        MessageNotification::where('user_id', $user->getKey())
+        MessageNotification::where('messageable_id', $participant->getKey())
             ->where('message_id', $this->id)
-            ->update(['flagged' => $this->flagged($user) ? false : true]);
+            ->where('messageable_type', get_class($participant))
+            ->update(['flagged' => $this->flagged($participant) ? false : true]);
 
         return $this;
     }

@@ -1,13 +1,6 @@
 <?php
 
 return [
-    'user_model' => 'App\User',
-
-    /*
-     * If not set, the package will use getKeyName() on the user_model specified above
-     */
-    'user_model_primary_key' => null,
-
     /*
      * This will allow you to broadcast an event when a message is sent
      * Example:
@@ -17,19 +10,49 @@ return [
     'broadcasts' => false,
 
     /*
-     * The event to fire when a message is sent
-     * See Musonza\Chat\Eventing\MessageWasSent if you want to customize.
+     * Specify the fields that you want to return each time for the sender.
+     * If not set or empty, all the columns for the sender will be returned
+     *
+     * However, if using multiple Models it's recommended to add getParticipantDetails to each
+     * Model you want to control fields output.
      */
-    'sent_message_event' => 'Musonza\Chat\Eventing\MessageWasSent',
-
-    /*
-     * Automatically convert conversations with more than two users to public
-     */
-    'make_three_or_more_users_public' => true,
 
     /*
      * Specify the fields that you want to return each time for the sender.
      * If not set or empty, all the columns for the sender will be returned
      */
     'sender_fields_whitelist' => [],
+
+    /*
+     * Whether to load the package routes file in your application.
+     */
+    'should_load_routes' => true,
+
+    /*
+     * Routes configuration
+     */
+    'routes' => [
+        'path_prefix' => 'chat',
+        'middleware'  => ['web'],
+    ],
+
+    /*
+     * Default values for pagination
+     */
+    'pagination' => [
+        'page'     => 1,
+        'perPage'  => 25,
+        'sorting'  => 'asc',
+        'columns'  => ['*'],
+        'pageName' => 'page',
+    ],
+
+    /*
+     * Model Transformers
+     */
+    'transformers' => [
+        'conversation' => null,
+        'message'      => null,
+        'participant'  => null,
+    ],
 ];

@@ -2,8 +2,11 @@
 
 namespace Musonza\Chat\Services;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Musonza\Chat\Eventing\ConversationStarted;
 use Musonza\Chat\Models\Conversation;
-use Musonza\Chat\Models\Message;
 use Musonza\Chat\Traits\Paginates;
 use Musonza\Chat\Traits\SetsParticipants;
 
@@ -11,7 +14,12 @@ class ConversationService
 {
     use SetsParticipants, Paginates;
 
-    protected $isPrivate = null;
+    protected $filters = [];
+
+    /**
+     * @var Conversation
+     */
+    public $conversation;
 
     public function __construct(Conversation $conversation)
     {
@@ -20,7 +28,11 @@ class ConversationService
 
     public function start($participants, $data = [])
     {
-        return $this->conversation->start($participants, $data);
+        $conversation = $this->conversation->start($participants, $data);
+
+        event(new ConversationStarted($conversation));
+
+        return $conversation;
     }
 
     public function setConversation($conversation)
@@ -37,12 +49,10 @@ class ConversationService
 
     /**
      * Get messages in a conversation.
-     *
-     * @return Message
      */
     public function getMessages()
     {
-        return $this->conversation->getMessages($this->user, $this->getPaginationParams(), $this->deleted);
+        return $this->conversation->getMessages($this->participant, $this->getPaginationParams(), $this->deleted);
     }
 
     /**
@@ -50,7 +60,7 @@ class ConversationService
      */
     public function clear()
     {
-        $this->conversation->clear($this->user);
+        $this->conversation->clear($this->participant);
     }
 
     /**
@@ -60,111 +70,92 @@ class ConversationService
      */
     public function readAll()
     {
-        $this->conversation->readAll($this->user);
+        $this->conversation->readAll($this->participant);
     }
 
     /**
      * Get Private Conversation between two users.
      *
-     * @param int | User $userOne
-     * @param int | User $userTwo
+     * @param Model $participantOne
+     * @param Model $participantTwo
      *
      * @return Conversation
      */
-    public function between($userOne, $userTwo)
+    public function between(Model $participantOne, Model $participantTwo)
     {
-        $conversation1 = $this->conversation->userConversations($userOne)->toArray();
-        $conversation2 = $this->conversation->userConversations($userTwo)->toArray();
+        $participantOneConversationIds = $this->conversation
+            ->participantConversations($participantOne, true)
+            ->pluck('id');
 
-        $common_conversations = $this->getConversationsInCommon($conversation1, $conversation2);
+        $participantTwoConversationIds = $this->conversation
+            ->participantConversations($participantTwo, true)
+            ->pluck('id');
 
-        if (!$common_conversations) {
-            return;
-        }
+        $common = $this->getConversationsInCommon($participantOneConversationIds, $participantTwoConversationIds);
 
-        return $this->conversation->findOrFail($common_conversations[0]);
+        return $common ? $this->conversation->findOrFail($common[0]) : null;
     }
 
     /**
-     * Get conversations that users have in common.
+     * Get Conversations with latest message.
      *
-     *  @param array | collection $users
-     *
-     * @return Conversations
-     */
-    public function common($users)
-    {
-        return $this->conversation->common($users);
-    }
-
-    /**
-     * Get Conversations with lastest message.
-     *
-     * @param object $user
-     *
-     * @return Illuminate\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      */
     public function get()
     {
-        if (is_null($this->isPrivate)) {
-            return $this->conversation->getList($this->user, $this->perPage, $this->page, $pageName = 'page');
-        }
-
-        return $this->conversation->getUserConversations($this->user, [
+        return $this->conversation->getParticipantConversations($this->participant, [
           'perPage'   => $this->perPage,
           'page'      => $this->page,
           'pageName'  => 'page',
-          'isPrivate' => $this->isPrivate,
+          'filters'   => $this->filters,
         ]);
     }
 
     /**
      * Add user(s) to a conversation.
      *
-     * @param Conversation $conversation
-     * @param int | array  $userId       / array of user ids or an integer
+     * @param array $participants
      *
      * @return Conversation
      */
-    public function addParticipants($userId)
+    public function addParticipants(array $participants)
     {
-        return $this->conversation->addParticipants($userId);
+        return $this->conversation->addParticipants($participants);
     }
 
     /**
      * Remove user(s) from a conversation.
      *
-     * @param Conversation $conversation
      * @param $users / array of user ids or an integer
      *
      * @return Conversation
      */
     public function removeParticipants($users)
     {
-        return $this->conversation->removeUsers($users);
+        return $this->conversation->removeParticipant($users);
     }
 
     /**
      * Get count for unread messages.
      *
-     * @return void
+     * @return int
      */
     public function unreadCount()
     {
-        return $this->conversation->unReadNotifications($this->user)->count();
+        return $this->conversation->unReadNotifications($this->participant)->count();
     }
 
     /**
      * Gets the conversations in common.
      *
-     * @param array $conversation1 The conversations for user one
-     * @param array $conversation2 The conversations for user two
+     * @param Collection $conversation1 The conversation Ids for user one
+     * @param Collection $conversation2 The conversation Ids for user two
      *
      * @return Conversation The conversations in common.
      */
-    private function getConversationsInCommon($conversation1, $conversation2)
+    private function getConversationsInCommon(Collection $conversation1, Collection $conversation2)
     {
-        return array_values(array_intersect($conversation1, $conversation2));
+        return array_values(array_intersect($conversation1->toArray(), $conversation2->toArray()));
     }
 
     /**
@@ -172,12 +163,34 @@ class ConversationService
      *
      * @param bool $isPrivate
      *
-     * @return bool
+     * @return $this
      */
     public function isPrivate($isPrivate = true)
     {
-        $this->isPrivate = $isPrivate;
+        $this->filters['private'] = $isPrivate;
 
         return $this;
+    }
+
+    /**
+     * Sets the conversation type to query for direct conversations.
+     *
+     * @param bool $isDirectMessage
+     *
+     * @return $this
+     */
+    public function isDirect($isDirectMessage = true)
+    {
+        $this->filters['direct_message'] = $isDirectMessage;
+
+        // Direct messages are always private
+        $this->filters['private'] = true;
+
+        return $this;
+    }
+
+    public function getParticipation()
+    {
+        return $this->participant->participation()->first();
     }
 }

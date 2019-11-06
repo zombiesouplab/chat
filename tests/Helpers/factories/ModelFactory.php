@@ -1,7 +1,10 @@
 <?php
 
 use Faker\Generator as Faker;
-use Musonza\Chat\User;
+use Musonza\Chat\Models\Conversation;
+use Musonza\Chat\Tests\Helpers\Models\Bot;
+use Musonza\Chat\Tests\Helpers\Models\Client;
+use Musonza\Chat\Tests\Helpers\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +24,24 @@ $factory->define(User::class, function (Faker $faker) {
         'name'           => $faker->name,
         'email'          => $faker->unique()->safeEmail,
         'password'       => $password ?: $password = bcrypt('secret'),
-        'remember_token' => 'hdhdhdhdhhdhdhdh',
+        'remember_token' => 'xahja87ahjahajhajhja',
+    ];
+});
+
+$factory->define(Client::class, function (Faker $faker) {
+    return [
+        'name'           => $faker->name,
+    ];
+});
+
+$factory->define(Bot::class, function (Faker $faker) {
+    return [
+        'name'           => $faker->name,
+    ];
+});
+
+$factory->define(Conversation::class, function (Faker $faker) {
+    return [
+        'data' => ['title' => $faker->sentence],
     ];
 });

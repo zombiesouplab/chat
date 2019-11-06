@@ -3,16 +3,30 @@
 namespace Musonza\Chat\Tests;
 
 require __DIR__.'/../database/migrations/create_chat_tables.php';
+require __DIR__.'/Helpers/migrations.php';
 
 use CreateChatTables;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use Musonza\Chat\User;
+use CreateTestTables;
+use Illuminate\Foundation\Application;
+use Musonza\Chat\ChatServiceProvider;
+use Musonza\Chat\Facades\ChatFacade;
+use Musonza\Chat\Tests\Helpers\Models\User;
+use Orchestra\Database\ConsoleServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $conversation;
-    protected $prefix = 'mc_';
+    protected $prefix = 'chat_';
+    protected $userModelPrimaryKey;
+    public $users;
+    /** @var User */
+    protected $alpha;
+    /** @var User */
+    protected $bravo;
+    /** @var User */
+    protected $charlie;
+    /** @var User */
+    protected $delta;
 
     public function __construct()
     {
@@ -22,11 +36,11 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void
     {
         parent::setUp();
-
         $this->artisan('migrate', ['--database' => 'testbench']);
-        $this->withFactories(__DIR__.'/../database/factories');
+        $this->withFactories(__DIR__.'/Helpers/factories');
         $this->migrate();
         $this->users = $this->createUsers(6);
+        list($this->alpha, $this->bravo, $this->charlie, $this->delta) = $this->users;
     }
 
     protected function migrateTestTables()
@@ -34,27 +48,19 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $config = config('musonza_chat');
         $userModel = app($config['user_model']);
         $this->userModelPrimaryKey = $userModel->getKeyName();
-
-        Schema::create('users', function (Blueprint $table) {
-            $table->increments($this->userModelPrimaryKey);
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
     }
 
     protected function migrate()
     {
         $this->migrateTestTables();
         (new CreateChatTables())->up();
+        (new CreateTestTables())->up();
     }
 
     /**
      * Define environment setup.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      *
      * @return void
      */
@@ -70,34 +76,46 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'prefix'   => '',
         ]);
 
-        // $app['config']->set('database.default', 'testbench');
-        // $app['config']->set('database.connections.testbench', [
-        //     'driver' => 'mysql',
-        //     'database' => 'chat',
-        //     'username' => 'root',
-        //     'host' => '127.0.0.1',
-        //     'password' => 'my-secret-pw',
-        //     'prefix' => '',
-        // ]);
+//         $app['config']->set('database.default', 'testbench');
+//         $app['config']->set('database.connections.testbench', [
+//             'driver' => 'mysql',
+//             'database' => 'chat',
+//             'username' => 'root',
+//             'host' => '127.0.0.1',
+//             'password' => 'my-secret-pw',
+//             'prefix' => '',
+//             'strict'      => true,
+//             'engine'      => null,
+//             'modes'       => [
+//                 'ONLY_FULL_GROUP_BY',
+//                 'STRICT_TRANS_TABLES',
+//                 'NO_ZERO_IN_DATE',
+//                 'NO_ZERO_DATE',
+//                 'ERROR_FOR_DIVISION_BY_ZERO',
+//                 'NO_ENGINE_SUBSTITUTION',
+//             ],
+//         ]);
 
-        $app['config']->set('musonza_chat.user_model', 'Musonza\Chat\User');
+        $app['config']->set('musonza_chat.user_model', 'Musonza\Chat\Tests\Helpers\Models\User');
         $app['config']->set('musonza_chat.sent_message_event', 'Musonza\Chat\Eventing\MessageWasSent');
         $app['config']->set('musonza_chat.broadcasts', false);
         $app['config']->set('musonza_chat.user_model_primary_key', null);
+        $app['config']->set('musonza_chat.routes.enabled', true);
+        $app['config']->set('musonza_chat.should_load_routes', true);
     }
 
     protected function getPackageProviders($app)
     {
         return [
-            \Orchestra\Database\ConsoleServiceProvider::class,
-            \Musonza\Chat\ChatServiceProvider::class,
+            ConsoleServiceProvider::class,
+            ChatServiceProvider::class,
         ];
     }
 
     protected function getPackageAliases($app)
     {
         return [
-            'Chat' => \Musonza\Chat\Facades\ChatFacade::class,
+            'Chat' => ChatFacade::class,
         ];
     }
 
@@ -109,12 +127,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function tearDown(): void
     {
         (new CreateChatTables())->down();
-        $this->rollbackTestTables();
+        (new CreateTestTables())->down();
         parent::tearDown();
-    }
-
-    protected function rollbackTestTables()
-    {
-        Schema::drop('users');
     }
 }

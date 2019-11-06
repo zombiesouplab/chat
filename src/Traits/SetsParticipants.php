@@ -2,57 +2,52 @@
 
 namespace Musonza\Chat\Traits;
 
+use Illuminate\Database\Eloquent\Model;
+
 trait SetsParticipants
 {
-    protected $from;
-    protected $to;
-    protected $user;
+    protected $sender;
+    protected $recipient;
+    protected $participant;
 
     /**
-     * Sets user.
+     * Sets participant.
      *
-     * @param object $user
+     * @param Model $participant
      *
      * @return $this
      */
-    public function for($user)
+    public function setParticipant(Model $participant): self
     {
-        $this->user = $user;
+        $this->participant = $participant;
 
         return $this;
     }
 
     /**
-     * Sets user.
+     * Sets the participant that's sending the message.
      *
-     * @param object $user
+     * @param Model $sender
      *
      * @return $this
      */
-    public function setUser($user)
+    public function from(Model $sender): self
     {
-        $this->user = $user;
+        $this->sender = $sender;
 
         return $this;
     }
 
     /**
-     * Set Sender.
+     * Sets the participant to receive the message.
      *
-     * @param int $from
+     * @param Model $recipient
      *
      * @return $this
      */
-    public function from($from)
+    public function to(Model $recipient): self
     {
-        $this->from = is_object($from) ? $from->getKey() : $from;
-
-        return $this;
-    }
-
-    public function to($recipient)
-    {
-        $this->to = $recipient;
+        $this->recipient = $recipient;
 
         return $this;
     }
