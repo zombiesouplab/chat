@@ -150,14 +150,19 @@ class Conversation extends BaseModel
      *
      * @param array $payload
      *
-     * @throws InvalidDirectMessageNumberOfParticipants
-     *
      * @return Conversation
+     * @throws DirectMessagingExistsException
+     *
+     * @throws InvalidDirectMessageNumberOfParticipants
      */
     public function start(array $payload): self
     {
-        if ($payload['direct_message'] && count($payload['participants']) > 2) {
-            throw new InvalidDirectMessageNumberOfParticipants();
+        if ($payload['direct_message']) {
+            if (count($payload['participants']) > 2) {
+                throw new InvalidDirectMessageNumberOfParticipants();
+            }
+
+            $this->ensureNoDirectMessagingExist($payload['participants']);
         }
 
         /** @var Conversation $conversation */
@@ -201,7 +206,9 @@ class Conversation extends BaseModel
             throw new InvalidDirectMessageNumberOfParticipants();
         }
 
-        $this->ensureNoDirectMessagingExist();
+        $participants = $this->participants()->get()->pluck('messageable');
+
+        $this->ensureNoDirectMessagingExist($participants);
 
         $this->direct_message = $isDirect;
         $this->save();
@@ -210,11 +217,11 @@ class Conversation extends BaseModel
     }
 
     /**
+     * @param $participants
      * @throws DirectMessagingExistsException
      */
-    private function ensureNoDirectMessagingExist()
+    private function ensureNoDirectMessagingExist($participants)
     {
-        $participants = $this->participants()->get()->pluck('messageable');
         /** @var Conversation $common */
         $common = Chat::conversations()->between($participants[0], $participants[1]);
 
