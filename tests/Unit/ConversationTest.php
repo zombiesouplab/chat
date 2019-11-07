@@ -54,9 +54,11 @@ class ConversationTest extends TestCase
         Chat::message('Hello there 0')->from($this->bravo)->to($conversation)->send();
         Chat::message('Hello there 0')->from($this->bravo)->to($conversation)->send();
         Chat::message('Hello there 0')->from($this->bravo)->to($conversation)->send();
+        Chat::message('Hello there 1')->from($this->alpha)->to($conversation)->send();
 
         Chat::conversation($conversation)->setParticipant($this->alpha)->readAll();
         $this->assertEquals(0, $conversation->unReadNotifications($this->alpha)->count());
+        $this->assertEquals(1, $conversation->unReadNotifications($this->bravo)->count());
     }
 
     /** @test  */

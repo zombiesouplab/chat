@@ -318,6 +318,8 @@ class Conversation extends BaseModel
                     $this->tablePrefix.'message_notifications.deleted_at as deleted_at',
                     $this->tablePrefix.'message_notifications.messageable_id',
                     $this->tablePrefix.'message_notifications.id as notification_id',
+                    $this->tablePrefix.'message_notifications.is_seen',
+                    $this->tablePrefix.'message_notifications.is_sender',
                     $this->tablePrefix.'messages.*',
                 ],
                 $paginationParams['pageName'],
