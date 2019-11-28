@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Musonza\Chat\BaseModel;
 use Musonza\Chat\Chat;
 use Musonza\Chat\ConfigurationManager;
+use Musonza\Chat\Eventing\AllParticipantsDeletedMessage;
 use Musonza\Chat\Eventing\EventGenerator;
 use Musonza\Chat\Eventing\MessageWasSent;
 
@@ -122,6 +123,16 @@ class Message extends BaseModel
             ->where('messageable_type', get_class($participant))
             ->where('message_id', $this->getKey())
             ->delete();
+
+        if ($this->unDeletedCount() === 0) {
+            event(new AllParticipantsDeletedMessage($this));
+        }
+    }
+
+    public function unDeletedCount()
+    {
+        return MessageNotification::where('message_id', $this->getKey())
+            ->count();
     }
 
     /**
