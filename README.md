@@ -239,9 +239,9 @@ Chat::message($message)->setParticipant($participantModel)->delete();
 
 What to cleanup when all participants have deleted a `$message` or `$conversation`?
 
-Listen for `\Musonza\Chat\Models\Message\AllParticipantsDeletedMessage` and 
+Listen for `\Musonza\Chat\Eventing\AllParticipantsDeletedMessage` and 
 
-`\Musonza\Chat\Models\Message\AllParticipantsClearedConversation`
+`\Musonza\Chat\Eventing\AllParticipantsClearedConversation`
 
 #### Clear a conversation
 
