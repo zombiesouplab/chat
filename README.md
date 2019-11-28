@@ -27,6 +27,7 @@ Create a Chat application for your multiple Models
   - [Mark whole conversation as read](#mark-whole-conversation-as-read)
   - [Unread messages count](#unread-messages-count)
   - [Delete a message](#delete-a-message)
+  - [Cleanup Deleted Messages](#cleanup-deleted-messages)
   - [Clear a conversation](#clear-a-conversation)
   - [Get participant conversations](#Get-participant-conversations)
   - [Get a conversation between two participants](#get-a-conversation-between-two-participants)
@@ -233,6 +234,14 @@ Chat::conversation($conversation)->setParticipant($participantModel)->unreadCoun
 ```php
 Chat::message($message)->setParticipant($participantModel)->delete();
 ```
+
+#### Cleanup Deleted Messages
+
+What to cleanup when all participants have deleted a `$message` or `$conversation`?
+
+Listen for `\Musonza\Chat\Models\Message\AllParticipantsDeletedMessage` and 
+
+`\Musonza\Chat\Models\Message\AllParticipantsClearedConversation`
 
 #### Clear a conversation
 
