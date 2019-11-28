@@ -325,8 +325,7 @@ class ConversationTest extends TestCase
         $settings = ['mute_mentions' => true];
 
         Chat::conversation($conversation)
-            ->setParticipant($this->alpha)
-            ->getParticipation()
+            ->getParticipation($this->alpha)
             ->update(['settings' => $settings]);
 
         $this->assertEquals(

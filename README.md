@@ -346,7 +346,7 @@ $participants = $conversation->getParticipants();
 #### Get participation entry for a Model in a conversation
 
 ```php
-Chat::conversation($conversation)->setParticipant($model)->getParticipation();
+Chat::conversation($conversation)->getParticipation($model);
 ```
 
 #### Update participation settings
@@ -357,8 +357,7 @@ Set Conversation settings for participant (example: mute_mentions, mute_conversa
 $settings = ['mute_mentions' => true];
 
 Chat::conversation($conversation)
-    ->setParticipant($this->alpha)
-    ->getParticipation()
+    ->getParticipation($this->alpha)
     ->update(['settings' => $settings]);
 ```
 
