@@ -30,7 +30,7 @@ class MessageNotification extends BaseModel
     {
         return self::where([
             ['messageable_id', '=', $participant->getKey()],
-            ['messageable_type', '=', get_class($participant)],
+            ['messageable_type', '=', $participant->getMorphClass()],
             ['is_seen', '=', 0],
         ])->get();
     }

@@ -61,7 +61,7 @@ class Message extends BaseModel
     {
         return MessageNotification::where('messageable_id', $participant->getKey())
             ->where('is_seen', 0)
-            ->where('messageable_type', get_class($participant))
+            ->where('messageable_type', $participant->getMorphClass())
             ->count();
     }
 
@@ -120,7 +120,7 @@ class Message extends BaseModel
     public function trash(Model $participant): void
     {
         MessageNotification::where('messageable_id', $participant->getKey())
-            ->where('messageable_type', get_class($participant))
+            ->where('messageable_type', $participant->getMorphClass())
             ->where('message_id', $this->getKey())
             ->delete();
 
@@ -145,7 +145,7 @@ class Message extends BaseModel
     public function getNotification(Model $participant): MessageNotification
     {
         return MessageNotification::where('messageable_id', $participant->getKey())
-            ->where('messageable_type', get_class($participant))
+            ->where('messageable_type', $participant->getMorphClass())
             ->where('message_id', $this->id)
             ->select([
                 '*',
@@ -168,7 +168,7 @@ class Message extends BaseModel
     {
         return (bool) MessageNotification::where('messageable_id', $participant->getKey())
             ->where('message_id', $this->id)
-            ->where('messageable_type', get_class($participant))
+            ->where('messageable_type', $participant->getMorphClass())
             ->where('flagged', 1)
             ->first();
     }
@@ -177,7 +177,7 @@ class Message extends BaseModel
     {
         MessageNotification::where('messageable_id', $participant->getKey())
             ->where('message_id', $this->id)
-            ->where('messageable_type', get_class($participant))
+            ->where('messageable_type', $participant->getMorphClass())
             ->update(['flagged' => $this->flagged($participant) ? false : true]);
 
         return $this;
