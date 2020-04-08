@@ -18,8 +18,8 @@ class ConversationParticipationControllerTest extends TestCase
         $clientModel = factory(Client::class)->create();
         $payload = [
             'participants' => [
-                ['id' => $userModel->getKey(), 'type' => get_class($userModel)],
-                ['id' => $clientModel->getKey(), 'type' => get_class($clientModel)],
+                ['id' => $userModel->getKey(), 'type' => $userModel->getMorphClass()],
+                ['id' => $clientModel->getKey(), 'type' => $clientModel->getMorphClass()],
             ],
         ];
 
@@ -54,7 +54,7 @@ class ConversationParticipationControllerTest extends TestCase
         $this->getJson(route('conversations.participation.show', [$conversation->getKey(), $participant->getKey()]))
             ->assertStatus(200)
             ->assertJson([
-                'messageable_type' => get_class($userModel),
+                'messageable_type' => $userModel->getMorphClass(),
             ]);
     }
 

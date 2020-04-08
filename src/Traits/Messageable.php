@@ -30,7 +30,7 @@ trait Messageable
 
         $participation = new Participation([
             'messageable_id'   => $this->getKey(),
-            'messageable_type' => get_class($this),
+            'messageable_type' => $this->getMorphClass(),
             'conversation_id'  => $conversation->getKey(),
         ]);
 
@@ -41,7 +41,7 @@ trait Messageable
     {
         $this->participation()->where([
             'messageable_id'   => $this->getKey(),
-            'messageable_type' => get_class($this),
+            'messageable_type' => $this->getMorphClass(),
             'conversation_id'  => $conversationId,
         ])->delete();
     }

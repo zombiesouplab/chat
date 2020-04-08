@@ -23,9 +23,9 @@ class ConversationControllerTest extends TestCase
         $botModel = factory(Bot::class)->create();
 
         $participants = [
-            ['id' => $userModel->getKey(), 'type' => get_class($userModel)],
-            ['id' => $clientModel->getKey(), 'type' => get_class($clientModel)],
-            ['id' => $botModel->getKey(), 'type' => get_class($botModel)],
+            ['id' => $userModel->getKey(), 'type' => $userModel->getMorphClass()],
+            ['id' => $clientModel->getKey(), 'type' => $clientModel->getMorphClass()],
+            ['id' => $botModel->getKey(), 'type' => $botModel->getMorphClass()],
         ];
 
         $payload = [
@@ -41,12 +41,12 @@ class ConversationControllerTest extends TestCase
 
         $this->assertDatabaseHas(ConfigurationManager::PARTICIPATION_TABLE, [
             'messageable_id'   => $userModel->getKey(),
-            'messageable_type' => get_class($userModel),
+            'messageable_type' => $userModel->getMorphClass(),
         ]);
 
         $this->assertDatabaseHas(ConfigurationManager::PARTICIPATION_TABLE, [
             'messageable_id'   => $botModel->getKey(),
-            'messageable_type' => get_class($botModel),
+            'messageable_type' => $botModel->getMorphClass(),
         ]);
     }
 
