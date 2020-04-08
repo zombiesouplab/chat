@@ -21,7 +21,7 @@ class ConversationMessageControllerTest extends TestCase
 
         $payload = [
             'participant_id'   => $userModel->getKey(),
-            'participant_type' => get_class($userModel),
+            'participant_type' => $userModel->getMorphClass(),
             'message'          => [
                 'body' => 'Hello',
             ],
@@ -50,7 +50,7 @@ class ConversationMessageControllerTest extends TestCase
         $parameters = [
             $conversation->getKey(),
             'participant_id'   => $userModel->getKey(),
-            'participant_type' => get_class($userModel),
+            'participant_type' => $userModel->getMorphClass(),
             'page'             => 1,
             'perPage'          => 2,
             'sorting'          => 'desc',
@@ -85,7 +85,7 @@ class ConversationMessageControllerTest extends TestCase
         $parameters = [
             $conversation->getKey(),
             'participant_id'   => $userModel->getKey(),
-            'participant_type' => get_class($userModel),
+            'participant_type' => $userModel->getMorphClass(),
         ];
 
         Chat::conversation($conversation)->addParticipants([$userModel, $clientModel]);
@@ -113,7 +113,7 @@ class ConversationMessageControllerTest extends TestCase
             $conversation->getKey(),
             $message->getKey(),
             'participant_id'   => $userModel->getKey(),
-            'participant_type' => get_class($userModel),
+            'participant_type' => $userModel->getMorphClass(),
         ];
 
         $this->deleteJson(route('conversations.messages.destroy', $parameters))
