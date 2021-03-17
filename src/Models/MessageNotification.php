@@ -38,7 +38,7 @@ class MessageNotification extends BaseModel
     public static function createCustomNotifications($message, $conversation)
     {
         $notification = [];
-        $i=0;
+        $i = 0;
         foreach ($conversation->participants as $participation) {
             $is_sender = ($message->participation_id == $participation->id) ? 1 : 0;
 
@@ -53,11 +53,11 @@ class MessageNotification extends BaseModel
                 'created_at'       => $message->created_at,
             ];
             $i++;
-            if($i>1000){
-                 self::insert($notification);
-                 $i = 0;
-                 $notification=[];
-            }
+            if ($i > 1000) {
+                self::insert($notification);
+                $i = 0;
+                $notification = [];
+             }
         }
         
         self::insert($notification);
