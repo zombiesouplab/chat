@@ -56,7 +56,7 @@ class MessageNotification extends BaseModel
             if($i>1000){
                  self::insert($notification);
                  $i = 0;
-                 $notification=[]
+                 $notification=[];
             }
         }
         
