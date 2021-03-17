@@ -57,9 +57,8 @@ class MessageNotification extends BaseModel
                 self::insert($notification);
                 $i = 0;
                 $notification = [];
-             }
+            }
         }
-        
         self::insert($notification);
     }
 
