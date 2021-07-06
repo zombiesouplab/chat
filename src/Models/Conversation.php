@@ -60,7 +60,7 @@ class Conversation extends BaseModel
     public function last_message()
     {
         return $this->hasOne(Message::class)
-            ->orderBy($this->tablePrefix.'messages.id', 'desc')
+            ->orderBy($this->tablePrefix.'messages.updated_at', 'desc')
             ->with('participation');
     }
 
@@ -323,7 +323,7 @@ class Conversation extends BaseModel
             ->where($this->tablePrefix.'message_notifications.messageable_type', $participant->getMorphClass())
             ->where($this->tablePrefix.'message_notifications.messageable_id', $participant->getKey());
         $messages = $deleted ? $messages->whereNotNull($this->tablePrefix.'message_notifications.deleted_at') : $messages->whereNull($this->tablePrefix.'message_notifications.deleted_at');
-        $messages = $messages->orderBy($this->tablePrefix.'messages.id', $paginationParams['sorting'])
+        $messages = $messages->orderBy($this->tablePrefix.'messages.updated_at', $paginationParams['sorting'])
             ->paginate(
                 $paginationParams['perPage'],
                 [
