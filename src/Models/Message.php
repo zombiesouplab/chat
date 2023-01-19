@@ -28,6 +28,7 @@ class Message extends BaseModel
      */
     protected $touches = ['conversation'];
 
+    protected $hidden = ['participation'];
     /**
      * The attributes that should be cast to native types.
      *
@@ -90,7 +91,7 @@ class Message extends BaseModel
 
         if (Chat::broadcasts()) {
             broadcast(new MessageWasSent($message))->toOthers();
-        } 
+        }
         // else {
         //     event(new MessageWasSent($message));
         // }
