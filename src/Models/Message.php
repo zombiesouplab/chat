@@ -28,7 +28,7 @@ class Message extends BaseModel
      */
     protected $touches = ['conversation'];
 
-    protected $hidden = ['participation'];
+    // protected $hidden = ['participation'];
     /**
      * The attributes that should be cast to native types.
      *
