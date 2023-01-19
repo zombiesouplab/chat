@@ -22,6 +22,12 @@ class Participation extends BaseModel
     ];
     protected $hidden = ['messageable'];
 
+    protected $appends = ['user'];
+
+    public function getUserAttribute()
+    {
+        return $this->messageable->only('id', 'display_name');
+    }
     /**
      * Conversation.
      *
