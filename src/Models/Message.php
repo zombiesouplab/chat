@@ -47,6 +47,12 @@ class Message extends BaseModel
 
     public function getSenderAttribute()
     {
+        if ($this->participation->messageable) {
+            return $this->participation->user;
+        } else {
+            return null;
+        }
+
         $participantModel = $this->participation->messageable;
 
         if (method_exists($participantModel, 'getParticipantDetails')) {
