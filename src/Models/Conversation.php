@@ -361,7 +361,7 @@ class Conversation extends BaseModel
                         ->where($this->tablePrefix . 'message_notifications.messageable_type', $participant->getMorphClass())
                         ->whereNull($this->tablePrefix . 'message_notifications.deleted_at');
                 },
-                'conversation.participants.messageable',
+                'conversation.participants.msgbl',
             ]);
 
         if (isset($options['filters']['private'])) {
