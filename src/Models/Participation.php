@@ -20,23 +20,13 @@ class Participation extends BaseModel
     protected $casts = [
         'settings' => 'array',
     ];
-    protected $appends = ['user', 'messageable'];
+    // protected $hidden = ['messageable'];
+
+    protected $appends = ['user'];
 
     public function getUserAttribute()
     {
-        if ($this->msgbl) {
-            return $this->msgbl->only('id', 'display_name');
-        } else {
-            return null;
-        }
-    }
-    public function getMessageableAttribute()
-    {
-        if ($this->msgbl) {
-            return $this->msgbl->only('id', 'display_name');
-        } else {
-            return null;
-        }
+        return $this->messageable->only('id', 'display_name');
     }
     /**
      * Conversation.
@@ -48,8 +38,8 @@ class Participation extends BaseModel
         return $this->belongsTo(Conversation::class, 'conversation_id');
     }
 
-    public function msgbl()
+    public function messageable()
     {
-        return $this->morphTo();
+        return $this->morphTo()->with('participation');
     }
 }

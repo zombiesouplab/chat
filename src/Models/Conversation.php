@@ -49,7 +49,7 @@ class Conversation extends BaseModel
 
     public function getParticipants()
     {
-        return $this->participants()->get()->pluck('msgbl');
+        return $this->participants()->get()->pluck('messageable');
     }
 
     /**
@@ -361,7 +361,7 @@ class Conversation extends BaseModel
                         ->where($this->tablePrefix . 'message_notifications.messageable_type', $participant->getMorphClass())
                         ->whereNull($this->tablePrefix . 'message_notifications.deleted_at');
                 },
-                'conversation.participants.msgbl',
+                'conversation.participants.messageable',
             ]);
 
         if (isset($options['filters']['private'])) {
