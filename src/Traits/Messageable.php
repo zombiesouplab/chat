@@ -19,7 +19,7 @@ trait Messageable
      */
     public function participation(): MorphMany
     {
-        return $this->morphMany(Participation::class, 'messageable');
+        return $this->morphMany(Participation::class, 'msgbl');
     }
 
     public function joinConversation(Conversation $conversation)
