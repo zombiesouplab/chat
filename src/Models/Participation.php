@@ -20,7 +20,7 @@ class Participation extends BaseModel
     protected $casts = [
         'settings' => 'array',
     ];
-    protected $hidden = ['messageable'];
+    // protected $hidden = ['messageable'];
 
     protected $appends = ['user'];
 
@@ -44,6 +44,6 @@ class Participation extends BaseModel
 
     public function messageable()
     {
-        return $this->morphTo()->with('participation');
+        return $this->morphTo()->only('id', 'display_name');
     }
 }
