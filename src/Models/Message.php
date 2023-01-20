@@ -47,7 +47,11 @@ class Message extends BaseModel
 
     public function getSenderAttribute()
     {
-        return $this->participation->user;
+        if ($this->participation) {
+            return $this->participation->user;
+        } else {
+            return null;
+        }
     }
 
     public function unreadCount(Model $participant)

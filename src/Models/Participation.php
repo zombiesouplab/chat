@@ -26,7 +26,11 @@ class Participation extends BaseModel
 
     public function getUserAttribute()
     {
-        return $this->messageable->only('id', 'display_name');
+        if ($this->messageable) {
+            return $this->messageable->only('id', 'display_name');
+        } else {
+            return null;
+        }
     }
     /**
      * Conversation.
