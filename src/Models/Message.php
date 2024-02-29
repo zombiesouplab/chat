@@ -49,7 +49,7 @@ class Message extends BaseModel
     {
         if ($this->participation) {
             if ($this->participation->messageable) {
-                return $this->participation->messageable->only('id', 'display_name');
+                return $this->participation->messageable->only('id', 'display_name', 'deleted_at');
             } else {
                 return null;
             }
