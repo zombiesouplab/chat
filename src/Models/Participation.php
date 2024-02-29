@@ -27,7 +27,7 @@ class Participation extends BaseModel
     public function getUserAttribute()
     {
         if ($this->messageable) {
-            return $this->messageable->only('id', 'display_name');
+            return $this->messageable->only('id', 'display_name', 'deleted_at');
         } else {
             return null;
         }
@@ -44,6 +44,6 @@ class Participation extends BaseModel
 
     public function messageable()
     {
-        return $this->morphTo();
+        return $this->morphTo()->withTrashed();
     }
 }
