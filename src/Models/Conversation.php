@@ -322,7 +322,9 @@ class Conversation extends BaseModel
             ->join($this->tablePrefix . 'message_notifications', $this->tablePrefix . 'message_notifications.message_id', '=', $this->tablePrefix . 'messages.id')
             ->where($this->tablePrefix . 'message_notifications.messageable_type', $participant->getMorphClass())
             ->where($this->tablePrefix . 'message_notifications.messageable_id', $participant->getKey());
-        $messages = $deleted ? $messages->whereNotNull($this->tablePrefix . 'message_notifications.deleted_at') : $messages->whereNull($this->tablePrefix . 'message_notifications.deleted_at');
+        if (!$deleted) {
+            $messages = $messages->whereNull($this->tablePrefix . 'message_notifications.deleted_at');
+        }
         $messages = $messages->orderBy($this->tablePrefix . 'messages.unix_timestamp', $paginationParams['sorting'])
             ->paginate(
                 $paginationParams['perPage'],
