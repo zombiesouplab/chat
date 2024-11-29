@@ -83,9 +83,9 @@ class Conversation extends BaseModel
      *
      * @return LengthAwarePaginator|HasMany|Builder
      */
-    public function getMessages(Model $participant, $paginationParams, $deleted = false)
+    public function getMessages(Model $participant, $paginationParams, $deleted = false, array $filters = [])
     {
-        return $this->getConversationMessages($participant, $paginationParams, $deleted);
+        return $this->getConversationMessages($participant, $paginationParams, $deleted, $filters);
     }
 
     public function getParticipantConversations($participant, array $options)

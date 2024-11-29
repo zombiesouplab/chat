@@ -52,9 +52,9 @@ class ConversationService
     /**
      * Get messages in a conversation.
      */
-    public function getMessages()
+    public function getMessages(array $filters = [])
     {
-        return $this->conversation->getMessages($this->participant, $this->getPaginationParams(), $this->deleted);
+        return $this->conversation->getMessages($this->participant, $this->getPaginationParams(), $this->deleted, $filters);
     }
 
     /**
