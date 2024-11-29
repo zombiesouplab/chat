@@ -316,15 +316,21 @@ class Conversation extends BaseModel
      *
      * @return LengthAwarePaginator|HasMany|Builder
      */
-    private function getConversationMessages(Model $participant, $paginationParams, $deleted)
+    private function getConversationMessages(Model $participant, $paginationParams, $deleted, array $filters)
     {
         $messages = $this->messages()
             ->join($this->tablePrefix . 'message_notifications', $this->tablePrefix . 'message_notifications.message_id', '=', $this->tablePrefix . 'messages.id')
             ->where($this->tablePrefix . 'message_notifications.messageable_type', $participant->getMorphClass())
             ->where($this->tablePrefix . 'message_notifications.messageable_id', $participant->getKey());
+
         if (!$deleted) {
             $messages = $messages->whereNull($this->tablePrefix . 'message_notifications.deleted_at');
         }
+
+        if (!empty($filters)) {
+            $messages = $messages->where($filters);
+        }
+
         $messages = $messages->orderBy($this->tablePrefix . 'messages.unix_timestamp', $paginationParams['sorting'])
             ->paginate(
                 $paginationParams['perPage'],
