@@ -328,6 +328,12 @@ class Conversation extends BaseModel
         }
 
         if (!empty($filters)) {
+            if (isset($filters['type'])) {
+                $types = explode(',', $filters['type']);
+                $messages = $messages->whereIn($this->tablePrefix . 'messages.type', $types);
+                unset($filters['type']);
+            }
+
             $messages = $messages->where($filters);
         }
 
