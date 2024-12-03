@@ -209,7 +209,9 @@ class Conversation extends BaseModel
 
         $participants = $this->participants()->get()->pluck('messageable');
 
-        $this->ensureNoDirectMessagingExist($participants);
+        if ($isDirect) {
+            $this->ensureNoDirectMessagingExist($participants);
+        }
 
         $this->direct_message = $isDirect;
         $this->save();
