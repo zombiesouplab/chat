@@ -329,14 +329,15 @@ class Conversation extends BaseModel
             $messages = $messages->whereNull($this->tablePrefix . 'message_notifications.deleted_at');
         }
 
-        if (!empty($filters)) {
-            if (isset($filters['type'])) {
-                $types = explode(',', $filters['type']);
-                $messages = $messages->whereIn($this->tablePrefix . 'messages.type', $types);
-                unset($filters['type']);
-            }
+        if (isset($filters['type'])) {
+            $types = explode(',', $filters['type']);
+            $messages = $messages->whereIn($this->tablePrefix . 'messages.type', $types);
+            unset($filters['type']);
+        }
 
-            $messages = $messages->where($filters);
+        if (isset($filters['created_before'])) {
+            $messages = $messages->where($this->tablePrefix . 'messages.created_at', '<=', $filters['created_before']);
+            unset($filters['created_before']);
         }
 
         $messages = $messages->orderBy($this->tablePrefix . 'messages.unix_timestamp', $paginationParams['sorting'])
