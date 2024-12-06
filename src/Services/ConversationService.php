@@ -195,6 +195,11 @@ class ConversationService
     {
         $participant = $participant ?? $this->participant;
 
-        return $participant->participation()->first();
+        return $participant->participation()
+            ->when(
+                $this->conversation,
+                fn ($query) => $query->where('conversation_id', $this->conversation->id),
+            )
+            ->first();
     }
 }
