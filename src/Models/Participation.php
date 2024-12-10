@@ -27,7 +27,7 @@ class Participation extends BaseModel
 
     public function getUserAttribute()
     {
-        if ($this->messageable) {
+        if (!$this->messageable) {
             return null;
         }
 
