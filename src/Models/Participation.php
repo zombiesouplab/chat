@@ -20,6 +20,7 @@ class Participation extends BaseModel
     protected $casts = [
         'settings' => 'array',
     ];
+
     // protected $hidden = ['messageable'];
 
     protected $appends = ['user'];
@@ -27,11 +28,16 @@ class Participation extends BaseModel
     public function getUserAttribute()
     {
         if ($this->messageable) {
-            return $this->messageable->only('id', 'display_name', 'deleted_at');
-        } else {
             return null;
         }
+
+        if (method_exists($this->messageable, 'getChatUserAttributes')) {
+            return $this->messageable->getChatUserAttributes();
+        }
+
+        return $this->messageable->only('id', 'display_name', 'deleted_at');
     }
+
     /**
      * Conversation.
      *
