@@ -47,15 +47,17 @@ class Message extends BaseModel
 
     public function getSenderAttribute()
     {
-        if ($this->participation) {
-            if ($this->participation->messageable) {
-                return $this->participation->messageable->only('id', 'display_name', 'deleted_at');
-            } else {
-                return null;
-            }
-        } else {
+        if (!$this->participation || !$this->participation->messageable) {
             return null;
         }
+
+        $messageable = $this->participation->messageable;
+
+        if (method_exists($messageable, 'getChatUserAttributes')) {
+            return $messageable->getChatUserAttributes();
+        }
+
+        return $messageable->only('id', 'display_name', 'deleted_at');
     }
 
     public function unreadCount(Model $participant)
